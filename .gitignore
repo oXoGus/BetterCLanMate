@@ -1,0 +1,5 @@
+bcm-db/bcm-scripts/bin
+bcm-db/bcm-scripts/include
+bcm-db/bcm-scripts/lib
+bcm-db/bcm-scripts/.env
+bcm-db/bcm-scripts/pyvenv.cfg
