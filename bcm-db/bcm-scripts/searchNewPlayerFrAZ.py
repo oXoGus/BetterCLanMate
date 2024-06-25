@@ -1,4 +1,5 @@
 import mysql.connector 
+from mysql.connector import Error, OperationalError
 import requests
 import json
 import time
@@ -15,7 +16,7 @@ load_dotenv()
 #on se co a la db
 conn = mysql.connector.connect(
     host=os.getenv('HOST'),
-	user=os.getenv('USERR'),
+	user=os.getenv('USERr'),
 	password=os.getenv('PASSWORD'),
 	database=os.getenv('DATABASE'))
 
@@ -23,13 +24,13 @@ cur = conn.cursor()
 
 
 searchPlayerHeader1 = {
-    'authorization' : os.getenv('SEARCH_PLAYER_HEADER_1')
-} 
+    'authorization' : os.getenv('SEARCH_PLAYER_HEADER')
+}
 
 while 1:
-        
+    try:
         #on récup les 20 premiers clans par ordre alphabétique Z-A qui n'ont pas encore ete check dans la db 
-        cur.execute('SELECT id FROM clanFR WHERE lastChecked IS NULL ORDER BY id ASC LIMIT 20 OFFSET 3000')
+        cur.execute('SELECT id FROM clanFR WHERE lastChecked IS NULL ORDER BY id ASC LIMIT 20')
         clanResult = cur.fetchall()
         
         if clanResult == []:
@@ -45,18 +46,46 @@ while 1:
                     }
 
                     #requete des data du clan
-                    urlClan = f'https://api.clashofclans.com/v1/clans/%23{clan[0][1:]}'
-                    responseClan = requests.get(urlClan, headers=searchPlayerHeader1)
+                    try:
+                        urlClan = f'https://api.clashofclans.com/v1/clans/%23{clan[0][1:]}'
+                        responseClan = requests.get(urlClan, headers=searchPlayerHeader1, timeout=5)
+                        
+                        # Lève une exception pour les erreurs HTTP
+                        responseClan.raise_for_status()
+                    except requests.exceptions.Timeout:
+                        print("La requête HTTP a expiré. on reéessaye dans 10 sec")
+                        time.sleep(10)
+                        
+                        #on retente une requette
+                        responseClan = requests.get(urlClan, headers=searchPlayerHeader1, timeout=5)
+                        
+                    except requests.exceptions.RequestException as e:
+                        print(f"Erreur de requête HTTP : {e}")
+
                     clan = responseClan.json()
                     clan = json.dumps(clan)
                     clan = json.loads(clan)
                     for member in clan['memberList']: # pour chaque membre du clan
                         try:
 
-                            #on fait la requette pour tout les joueurs de la db
-                            memberUrl = f'https://api.clashofclans.com/v1/players/%23{member["tag"][1:]}'
-                            responseMember = requests.get(memberUrl, headers=searchPlayerHeader1)
-                            #time.sleep(1)
+                            # try pour éviter les blocages due aux timeout 
+                            try:
+                                #on fait la requette pour tout les joueurs de la db
+                                memberUrl = f'https://api.clashofclans.com/v1/players/%23{member["tag"][1:]}'
+                                responseMember = requests.get(memberUrl, headers=searchPlayerHeader1, timeout=5)
+
+                                # Lève une exception pour les erreurs HTTP
+                                responseMember.raise_for_status()
+                            except requests.exceptions.Timeout:
+                                print("La requête HTTP a expiré. on reéessaye dans 10 sec")
+                                time.sleep(10)
+                        
+                                #on retente une requett
+                                responseMember = requests.get(memberUrl, headers=searchPlayerHeader1, timeout=5)
+                        
+                            except requests.exceptions.RequestException as e:
+                                print(f"Erreur de requête HTTP : {e}")
+                            
                             member = responseMember.json()
                             member = json.dumps(member)
                             member = json.loads(member)
@@ -164,14 +193,23 @@ while 1:
                                 cur.execute('UPDATE joueursFR SET id = %(id)s, rate = %(rate)s, hdv = %(hdv)s, tr = %(tr)s, xp = %(xp)s, donation = %(donation)s, jdc = %(jdc)s, warStars = %(warStars)s, clanID = %(clanID)s, noClanDuration = %(noClanDuration)s, label1 = %(label1)s, label2 = %(label2)s, label3 = %(label3)s, lastChecked = CURRENT_TIMESTAMP WHERE id = %(id)s', (playerData))
                                 conn.commit()
                                 print(f"player {member['tag']} updated !")
-    
+                        except KeyboardInterrupt:
+                            pass
+                            #print('reset')
                         except Exception:
                             traceback.print_exc() # on affiche les erreur
 
                     #on marque la date du check un fois que tout les joueurs sont mis dans la db
                     cur.execute('UPDATE clanFR SET lastChecked = CURRENT_TIMESTAMP WHERE id = %(id)s', (clanData))
                     conn.commit()
-                    print(f"clan {clan['tag']} checked !")
+                    #print(f"clan {clan['tag']} checked !")
 
+                except KeyboardInterrupt:
+                    pass
+                    #print('reset')
                 except Exception:
                     traceback.print_exc() # on affiche les erreur
+    except OperationalError as e:
+        print(f"Erreur opérationnelle (probablement une coupure de connexion) : {e}")
+    except Error as e:
+        print(f"Erreur de connexion : {e}")
