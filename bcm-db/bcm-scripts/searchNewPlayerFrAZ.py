@@ -3,7 +3,6 @@ from mysql.connector import Error, OperationalError # type: ignore
 import requests
 import json
 import time
-from random import randint
 from dotenv import load_dotenv
 import os
 import traceback

@@ -2,7 +2,6 @@ import mysql.connector # type: ignore
 import requests
 import json
 import time
-from random import randint
 from dotenv import load_dotenv
 import os
 import traceback
@@ -201,7 +200,5 @@ while 1:
                     conn.commit()
                     print(f"clan {clan['tag']} checked !")
 
-                except KeyboardInterrupt:
-                    print('reset')
                 except Exception:
                     traceback.print_exc() # on affiche les erreur
