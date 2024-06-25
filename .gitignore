@@ -4,3 +4,5 @@ bcm-db/bcm-scripts/lib
 bcm-db/bcm-scripts/.env
 bcm-db/bcm-scripts/pyvenv.cfg
 .DS_Store
+bcm-db/.DS_Store
+bcm-db/bcm-scripts/.DS_Store
