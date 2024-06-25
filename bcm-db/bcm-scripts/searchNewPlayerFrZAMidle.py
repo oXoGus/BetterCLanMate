@@ -1,4 +1,4 @@
-import mysql.connector 
+import mysql.connector # type: ignore
 import requests
 import json
 import time

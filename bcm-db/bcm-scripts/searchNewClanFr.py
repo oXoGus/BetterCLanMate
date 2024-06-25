@@ -1,4 +1,4 @@
-import mysql.connector 
+import mysql.connector # type: ignore
 import requests
 import json
 import time
@@ -26,7 +26,7 @@ cur = conn.cursor()
 searchClanHeader = {
     'authorization' : os.getenv('SEARCH_CLAN_HEADER')
 }
-    
+
 searchPlayerHeader = searchClanHeader
 try :
     while 1:

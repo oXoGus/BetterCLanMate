@@ -1,5 +1,5 @@
-import mysql.connector 
-from mysql.connector import Error, OperationalError
+import mysql.connector # type: ignore
+from mysql.connector import Error, OperationalError # type: ignore
 import requests
 import json
 import time
