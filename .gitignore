@@ -44,3 +44,9 @@ bcm-app/.vercel
 *.tsbuildinfo
 next-env.d.ts
 
+
+
+#api
+bcm-backend/package-lock.json
+bcm-backend/node_modules
+bcm-backend/.env
