@@ -6,3 +6,41 @@ bcm-db/bcm-scripts/pyvenv.cfg
 .DS_Store
 bcm-db/.DS_Store
 bcm-db/bcm-scripts/.DS_Store
+
+# See https://help.github.com/articles/ignoring-files/ for more about ignoring files.
+
+# dependencies
+bcm-app/node_modules
+bcm-app/.pnp
+bcm-app/.pnp.js
+bcm-app/.yarn/install-state.gz
+
+# testing
+bcm-app/coverage
+
+# next.js
+bcm-app/.next/
+bcm-app/out/
+
+# production
+bcm-app/build
+
+# misc
+bcm-app/.DS_Store
+*.pem
+
+# debug
+bcm-app/npm-debug.log*
+bcm-app/yarn-debug.log*
+bcm-app/yarn-error.log*
+
+# local env files
+bcm-app/.env*.local
+
+# vercel
+bcm-app/.vercel
+
+# typescript
+*.tsbuildinfo
+next-env.d.ts
+
