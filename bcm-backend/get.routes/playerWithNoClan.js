@@ -13,3 +13,5 @@ router.get("/", (req, res) => {
     res.json({message : "page d'acceuil de l'api de BetterCLanMate"})
 
 })
+
+module.exports = router; // on renvoie l'url
