@@ -6,7 +6,7 @@ const port = 5000
 const app = express()
 
 // on définit la route principale (c'est la page : bcm/api/)
-app.get('/', (req, res) => {
+app.get('/api', (req, res) => {
     res.json({message : "page d'acceuil de l'api de BetterCLanMate"})
 })
 
