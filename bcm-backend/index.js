@@ -1,9 +1,12 @@
 const express = require('express')
+const loggerMiddleware = require('./loggerMiddleware');
 
 const port = 5000
 
 // on créer l'application
 const app = express()
+
+app.use(loggerMiddleware)
 
 // on définit la route principale (c'est la page : bcm/api/)
 app.get('/api', (req, res) => {
