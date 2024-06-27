@@ -40,6 +40,8 @@ bcm-app/.env*.local
 # vercel
 bcm-app/.vercel
 
+bcm-app/package-lock.json
+
 # typescript
 *.tsbuildinfo
 next-env.d.ts
