@@ -1,7 +1,8 @@
-import mysql.connector # type: ignore
+import mysql.connector 
 import requests
 import json
 import time
+from random import randint
 from dotenv import load_dotenv
 import os
 import traceback
@@ -26,18 +27,18 @@ searchPlayerHeader1 = {
 }
 
 while 1:
-        
+        time.sleep(1)
         #on récup les 20 premiers clans par ordre alphabétique Z-A qui n'ont pas encore ete check dans la db 
-        cur.execute('SELECT id FROM clanFR WHERE lastChecked IS NULL ORDER BY id DESC LIMIT 20')
+        cur.execute('SELECT id FROM clanFR WHERE lastChecked IS NULL ORDER BY id DESC')
         clanResult = cur.fetchall()
-        
+
         if clanResult == []:
-            raise Exception('No more clan no checked !')  
+            time.sleep(10)
         else:     
             for clan in clanResult: # pour chaque clan
                 try:
 
-                    print(clan[0][1:])
+                    #print(clan[0][1:])
 
                     clanData = {
                         'id' : clan[0]
@@ -51,12 +52,17 @@ while 1:
                         # Lève une exception pour les erreurs HTTP
                         responseClan.raise_for_status()
                     except requests.exceptions.Timeout:
-                        print("La requête HTTP a expiré. on reéessaye dans 10 sec")
-                        time.sleep(10)
-                        
-                        #on retente une requette
-                        responseClan = requests.get(urlClan, headers=searchPlayerHeader1, timeout=5)
-                        
+                        try:
+                            print("La requête HTTP a expiré. on reéessaye dans 10 sec")
+                            time.sleep(10)
+                            
+                            #on retente une requette
+                            responseClan = requests.get(urlClan, headers=searchPlayerHeader1, timeout=5)
+                            responseClan.raise_for_status()
+                        except requests.exceptions.Timeout as e:
+                            print("2 timeout")
+                            continue   
+
                     except requests.exceptions.RequestException as e:
                         print(f"Erreur de requête HTTP : {e}")
 
@@ -66,7 +72,6 @@ while 1:
                     for member in clan['memberList']: # pour chaque membre du clan
                         try:
 
-                            # try pour éviter les blocages due aux timeout 
                             try:
                                 #on fait la requette pour tout les joueurs de la db
                                 memberUrl = f'https://api.clashofclans.com/v1/players/%23{member["tag"][1:]}'
@@ -75,12 +80,17 @@ while 1:
                                 # Lève une exception pour les erreurs HTTP
                                 responseMember.raise_for_status()
                             except requests.exceptions.Timeout:
-                                print("La requête HTTP a expiré. on reéessaye dans 10 sec")
-                                time.sleep(10)
+                                try:
+                                    print("La requête HTTP a expiré. on reéessaye dans 10 sec")
+                                    time.sleep(10)
+                            
+                                    #on retente une requett
+                                    responseMember = requests.get(memberUrl, headers=searchPlayerHeader1, timeout=5)
+                                    responseMember.raise_for_status()
+                                except requests.exceptions.Timeout as e:
+                                    print("2 timeout")
+                                    continue
                         
-                                #on retente une requett
-                                responseMember = requests.get(memberUrl, headers=searchPlayerHeader1, timeout=5)
-
                             except requests.exceptions.RequestException as e:
                                 print(f"Erreur de requête HTTP : {e}")
                             
@@ -142,7 +152,7 @@ while 1:
                                 cur.execute('INSERT INTO joueursFR (id, rate, hdv, tr, xp, donation, jdc, warStars, clanID, noClanDuration, label1, label2, label3, lastChecked) VALUES (%(id)s, %(rate)s, %(hdv)s, %(tr)s, %(xp)s, %(donation)s, %(jdc)s, %(warStars)s, %(clanID)s, %(noClanDuration)s, %(label1)s, %(label2)s, %(label3)s, CURRENT_TIMESTAMP)', (playerData)) # on place toutes les donné dans la base de donnée
                                 # on affiche les data pour les log
                                 conn.commit() # on enregistre les modification de la data base 
-                                print(f"player {member['tag']} inserted !")
+                                #print(f"player {member['tag']} inserted !")
 
 
                             else: # si le tag du joueur existe deja dans la base de donnée , on update toutes les data
@@ -190,7 +200,7 @@ while 1:
                                 # on met a jour les donnée de la ligne qui verifie la condition               
                                 cur.execute('UPDATE joueursFR SET id = %(id)s, rate = %(rate)s, hdv = %(hdv)s, tr = %(tr)s, xp = %(xp)s, donation = %(donation)s, jdc = %(jdc)s, warStars = %(warStars)s, clanID = %(clanID)s, noClanDuration = %(noClanDuration)s, label1 = %(label1)s, label2 = %(label2)s, label3 = %(label3)s, lastChecked = CURRENT_TIMESTAMP WHERE id = %(id)s', (playerData))
                                 conn.commit()
-                                print(f"player {member['tag']} updated !")
+                                #print(f"player {member['tag']} updated !")
                         except KeyboardInterrupt:
                             print('reset')
                         except Exception:
@@ -199,7 +209,7 @@ while 1:
                     #on marque la date du check un fois que tout les joueurs sont mis dans la db
                     cur.execute('UPDATE clanFR SET lastChecked = CURRENT_TIMESTAMP WHERE id = %(id)s', (clanData))
                     conn.commit()
-                    print(f"clan {clan['tag']} checked !")
+                    #print(f"clan {clan['tag']} checked !")
 
                 except KeyboardInterrupt:
                     print('reset')

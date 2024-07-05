@@ -1,4 +1,4 @@
-import mysql.connector # type: ignore
+import mysql.connector 
 import requests
 import json
 import time
@@ -26,6 +26,7 @@ searchPlayerHeader1 = {
     'authorization' : os.getenv('SEARCH_PLAYER_HEADER_3')
 }
 while 1:
+        time.sleep(1)
         cur.execute('SELECT id FROM joueursFR ORDER BY lastChecked ASC')
         playerList = cur.fetchall()
         
@@ -67,12 +68,13 @@ while 1:
                     player = json.dumps(player)
                     player = json.loads(player)
                     
-
+                    
                     #on verif si le joueur n'existe pas dans la base de donnée
                     playerId = {
                         'id' : player['tag']
                     } 
                     
+
                     # on update les data du joueur 
                     # verifie le nombre de labels pour eviter les erreures
                     playerLabels = player['labels']
@@ -153,7 +155,7 @@ while 1:
                         cur.execute('UPDATE joueursFR SET id = %(id)s, rate = %(rate)s, hdv = %(hdv)s, tr = %(tr)s, xp = %(xp)s, donation = %(donation)s, jdc = %(jdc)s, warStars = %(warStars)s, clanID = %(clanID)s, noClanDuration = CURRENT_TIMESTAMP, label1 = %(label1)s, label2 = %(label2)s, label3 = %(label3)s, lastChecked = CURRENT_TIMESTAMP WHERE id = %(id)s', (playerData))
                         conn.commit()
         
-                        print(f"player {player['tag']} n'a pas de clan !")
+                        #print(f"player {player['tag']} n'a pas de clan !")
 
                 except Exception:
                     traceback.print_exc() # on affiche les erreur

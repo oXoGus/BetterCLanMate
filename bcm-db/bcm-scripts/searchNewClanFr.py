@@ -1,5 +1,5 @@
-import mysql.connector # type: ignore
-from mysql.connector import Error, OperationalError # type: ignore
+import mysql.connector 
+from mysql.connector import Error, OperationalError
 import requests
 import json
 import time
@@ -31,6 +31,7 @@ searchClanHeader = {
 searchPlayerHeader = searchClanHeader
 try :
     while 1:
+        time.sleep(1)
         try:
             random = randint(800, 832)
             try:
@@ -39,11 +40,16 @@ try :
 
                 response.raise_for_status()
             except requests.exceptions.Timeout:
-                print("La requête HTTP a expiré. on reéessaye dans 10 sec")
-                time.sleep(10)
-                        
-                #on retente une requette
-                response = requests.get(url, headers=searchClanHeader, timeout=5) # envoie de la requete a l'API                        
+                try:
+                    print("La requête HTTP a expiré. on reéessaye dans 10 sec")
+                    time.sleep(10)
+                            
+                    #on retente une requette
+                    response = requests.get(url, headers=searchClanHeader, timeout=5) # envoie de la requete a l'API    
+                    response.raise_for_status()
+                except requests.exceptions.Timeout as e:
+                    print("2 timeout")
+                    continue
             except requests.exceptions.RequestException as e:
                 print(f"Erreur de requête HTTP : {e}")
                 
@@ -55,7 +61,7 @@ try :
             for clans in clanList: # pour chaque element de la liste
                 try:
 
-                    print(f"({count}/{len(clanList)})", end='\r')
+                    #print(f"({count}/{len(clanList)})", end='\r')
 
                     if clans['chatLanguage']['languageCode'] == "FR":
                         clanTag = {
@@ -65,7 +71,7 @@ try :
                         cur.execute('SELECT id FROM clanFR WHERE id = %(clanTag)s', (clanTag))
                         clanResult = cur.fetchone()
                         if clanResult == None:
-                            print(f"            {datetime.now()} -> {clans['name']}, {clans['tag']}, n'est pas dans la base de donnée                   ", end='\r') # log pour le terminal
+                            #print(f"            {datetime.now()} -> {clans['name']}, {clans['tag']}, n'est pas dans la base de donnée                   ", end='\r') # log pour le terminal
                             cur.execute('INSERT INTO clanFR (id) VALUES (%(clanTag)s)', (clanTag)) # on ajoute le clan dans la base de donnée
                             conn.commit()
                         else:
