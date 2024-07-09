@@ -18,15 +18,17 @@ router.get("/:param", (req, res) => {
 
     axios.get(`https://api.clashofclans.com/v1/clans/%23${clanTag}`, {headers : apiHeader})
     .then((response) => {
-        console.log(response.status);
+
+        // si le existe bien 
+        const clanData = response.data;
     })
     .catch((error) => {
-        //console.log(error);
+
+        // si le clan n'existe pas
+        res.status(404).json({message : "le clan n'existe pas"})
     });
 
-
-
-    
+    // on 
     const connection  = mysql.createConnection({
         host: process.env.HOST,
         user: process.env.USERr,
@@ -34,7 +36,7 @@ router.get("/:param", (req, res) => {
         database: process.env.DATABASE,
         });
 
-    res.json({message : "page d'acceuil de l'api de pppp"})
+    res.json(clanData)
 
 })
 
