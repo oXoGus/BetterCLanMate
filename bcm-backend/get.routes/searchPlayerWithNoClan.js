@@ -16,9 +16,6 @@ router.get("/:param", (req, res) => {
     // on verif que le tag du clan est valide
     clanTag = req.params.param;
 
-    // on retire le #
-    clanTag = clanTag.substring(1);
-
     axios.get(`https://api.clashofclans.com/v1/clans/%23${clanTag}`, {headers : apiHeader})
     .then((response) => {
         clanData = response
