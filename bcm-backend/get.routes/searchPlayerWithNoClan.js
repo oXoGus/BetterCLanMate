@@ -18,7 +18,7 @@ router.get("/:param", (req, res) => {
 
     axios.get(`https://api.clashofclans.com/v1/clans/%23${clanTag}`, {headers : apiHeader})
     .then((response) => {
-        console.log(response);
+        console.log(response.status);
     })
     .catch((error) => {
         console.log(error);
