@@ -19,6 +19,7 @@ router.get("/:param", (req, res) => {
     axios.get(`https://api.clashofclans.com/v1/clans/%23${clanTag}`, {headers : apiHeader})
     .then((response) => {
         clanData = response.data
+        console.log(clanData);
         clanData = JSON.parse(clanData)
         console.log(clanData);
     })
