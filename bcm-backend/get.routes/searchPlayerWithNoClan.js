@@ -54,9 +54,7 @@ router.get("/:param", (req, res) => {
                     return
                 }       
 
-                playerID = result[0].id
-                playerID.substring(1)
-                
+                var playerID = result[0].id.slice(1)
                 // on recup toutes les data du joueur en back pour cacher le header de l'api de coc
                 axios.get(`https://api.clashofclans.com/v1/players/%23${playerID}`, {headers : apiHeader})
                 .then((response) => {
