@@ -45,6 +45,12 @@ router.get("/:param", (req, res) => {
                     res.send("Erreur de requête : " + err.stack);
                     return;
                 }
+
+                if (result == []) {
+                    res.status(404).json({message : "aucun joueur n'a pas de clan"})
+                    connection.end();
+                    return
+                }                  
                 connection.end();
 
                 console.log(result)
