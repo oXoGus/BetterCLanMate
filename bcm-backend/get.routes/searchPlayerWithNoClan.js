@@ -21,7 +21,7 @@ router.get("/:param", (req, res) => {
         console.log(response.status);
     })
     .catch((error) => {
-        console.log(error);
+        //console.log(error);
     });
 
 
