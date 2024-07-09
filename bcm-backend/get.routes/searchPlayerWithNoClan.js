@@ -40,10 +40,14 @@ router.get("/:param", (req, res) => {
 
             connection.query("SELECT id FROM joueursFR WHERE clanID IS NULL AND hdv > ? AND tr > ? ORDER BY noClanDuration DESC LIMIT 1; ", [clanData["requiredTrophies"], clanData["requiredTownhallLevel"]], (err, result) => {
                 if(err){
+                    connection.end();
                     console.log("Erreur de requête : " + err.stack)
                     res.send("Erreur de requête : " + err.stack);
                     return;
                 }
+                connection.end();
+
+                console.log(result[0])
                 res.json(result[0])
             })
         });
