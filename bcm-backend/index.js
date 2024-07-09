@@ -13,7 +13,7 @@ app.get('/', (req, res) => {
     res.json({message : "page d'acceuil de l'api de BetterCLanMate"})
 })
 
-const playerWithNoClan = require('./get.routes/playerWithNoClan')
-app.use("/get/playerWithNoClan", playerWithNoClan)
+const searchPlayerWithNoClan = require('./put.routes/searchPlayerWithNoClan')
+app.use("/put/searchPlayerWithNoClan", searchPlayerWithNoClan)
 
 app.listen(port, () => {console.log("le serveur est en ligne !")}) // on demare le serveur sur le port et on envoie un message dans les log
