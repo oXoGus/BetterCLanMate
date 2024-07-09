@@ -29,6 +29,9 @@ router.get("/:param", (req, res) => {
             database: process.env.DATABASE,
             });
     
+        connection.connect();
+        
+
         res.json(clanData)
     })
     .catch((error) => {
