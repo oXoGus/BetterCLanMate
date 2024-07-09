@@ -38,7 +38,7 @@ router.get("/:param", (req, res) => {
             
             console.log("Connecté en tant que : " + connection.threadId);
 
-            connection.query("SELECT id FROM joueursFR WHERE clanID IS NULL AND hdv > ? AND tr > ? ORDER BY noClanDuration DESC LIMIT 1; ", [clanData["requiredTownhallLevel"], clanData["requiredTrophies"]], (err, result) => {
+            connection.query("SELECT id, noClanDuration FROM joueursFR WHERE clanID IS NULL AND hdv > ? AND tr > ? ORDER BY noClanDuration DESC LIMIT 1; ", [clanData["requiredTownhallLevel"], clanData["requiredTrophies"]], (err, result) => {
                 if(err){
                     connection.end();
                     console.log("Erreur de requête : " + err.stack)
@@ -46,7 +46,6 @@ router.get("/:param", (req, res) => {
                     return;
                 }
 
-                console.log(clanData["requiredTrophies"], clanData["requiredTownhallLevel"])
 
                 if (result.length == 0) {
                     res.status(403).json({message : "aucun joueur ne correspond aux critères de votre clan"})
@@ -54,9 +53,8 @@ router.get("/:param", (req, res) => {
                     return
                 }                  
                 connection.end();
-
-                console.log(result)
                 res.json(result[0])
+                return
             })
         });
     })
