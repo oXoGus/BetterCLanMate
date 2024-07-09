@@ -20,7 +20,7 @@ router.get("/:param", (req, res) => {
     .then((response) => {
         const clanDataString = JSON.stringify(response.data)
         console.log(clanDataString);
-        const clanData = JSON.parse(response.data)
+        const clanData = JSON.parse(clanDataString)
         console.log(clanData);
     })
     .catch((error) => {
