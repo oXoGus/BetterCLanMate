@@ -37,7 +37,9 @@ router.get("/:param", (req, res) => {
             }
             
             console.log("Connecté en tant que : " + connection.threadId);
-
+            
+            // on part du principe que le joueur n'a pas rejoint de clan entre temps 
+            // TODO : on init un var clanID en true et on entre dans une boucle tant que le joueur a rejoint un clan enter temps on recherche le joueurs suivant et on supprime le precedent
             connection.query("SELECT id, noClanDuration FROM joueursFR WHERE clanID IS NULL AND hdv > ? AND tr > ? ORDER BY noClanDuration DESC LIMIT 1; ", [clanData["requiredTownhallLevel"], clanData["requiredTrophies"]], (err, result) => {
                 if(err){
                     connection.end();
@@ -46,15 +48,23 @@ router.get("/:param", (req, res) => {
                     return;
                 }
 
-
                 if (result.length == 0) {
-                    res.status(403).json({message : "aucun joueur ne correspond aux critères de votre clan"})
+                    res.json({message : "aucun joueur ne correspond aux critères de votre clan"})
                     connection.end();
                     return
-                }                  
-                connection.end();
-                res.json(result[0])
-                return
+                }       
+                
+                // on recup toutes les data du joueur en back pour cacher le header de l'api de coc
+                axios.get(`https://api.clashofclans.com/v1/players/%23${result[0].id}`, {headers : apiHeader})
+                .then((response) => {
+                    connection.end();
+                    res.json([response.data, result[0]])
+                })
+                .catch((error) => {
+                    connection.end();
+                    res.json({message : "la requête a echoué", error : error})
+                })
+
             })
         });
     })
