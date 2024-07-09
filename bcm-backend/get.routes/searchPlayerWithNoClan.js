@@ -47,7 +47,7 @@ router.get("/:param", (req, res) => {
                 }
                 connection.end();
 
-                console.log(result[0])
+                console.log(result)
                 res.json(result[0])
             })
         });
