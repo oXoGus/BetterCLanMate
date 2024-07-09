@@ -46,6 +46,8 @@ router.get("/:param", (req, res) => {
                     return;
                 }
 
+                console.log(clanData["requiredTrophies"], clanData["requiredTownhallLevel"])
+
                 if (result.length == 0) {
                     res.status(403).json({message : "aucun joueur ne correspond aux critères de votre clan"})
                     connection.end();
