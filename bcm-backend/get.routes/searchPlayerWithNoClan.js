@@ -46,7 +46,7 @@ router.get("/:param", (req, res) => {
                     return;
                 }
 
-                if (result == []) {
+                if (result.length == 0) {
                     res.status(403).json({message : "aucun joueur ne correspond aux critères de votre clan"})
                     connection.end();
                     return
