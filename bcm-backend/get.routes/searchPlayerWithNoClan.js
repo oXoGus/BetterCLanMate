@@ -29,15 +29,34 @@ router.get("/:param", (req, res) => {
             database: process.env.DATABASE,
             });
     
-        connection.connect();
+        connection.connect((err) => {
+            if(err){
+                console.log("Erreur de connexion : " + err.stack)
+                res.send("Erreur de connexion : " + err.stack);
+                return;
+            }
+
+            connection.query("SELECT id FROM joueursFR WHERE clanID IS NULL AND hdv > ? AND tr > ? ORDER BY noClanDuration DESC; ", [clanData["requiredTrophies"], clanData["requiredTownhallLevel"]], (err, result) => {
+                if(err){
+                    console.log("Erreur de requête : " + err.stack)
+                    res.send("Erreur de requête : " + err.stack);
+                    return;
+                }
+                res.json(result)
+            })
+        });
+
+
         
 
         res.json(clanData)
+        return
     })
     .catch((error) => {
 
         // si le clan n'existe pas
         res.status(404).json({message : "le clan n'existe pas"})
+        return
     });
     
 
