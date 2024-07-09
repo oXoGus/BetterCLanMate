@@ -60,10 +60,12 @@ router.get("/:param", (req, res) => {
                 .then((response) => {
                     connection.end();
                     res.json([response.data, result[0]])
+                    return
                 })
                 .catch((error) => {
                     connection.end();
                     res.json({message : "la requête a echoué", error : error})
+                    return
                 })
 
             })

@@ -8,6 +8,7 @@ import Navbar from "../components/Navbar";
 export default function Home() {
   
   const [clanTag, setClanTag] = useState("#2Q8G0LPU0");
+  const [playerData , setPlayerData] = useState(false);
 
   const onClanTagChange = (event) => {
     setClanTag(event.target.value);
@@ -16,9 +17,9 @@ export default function Home() {
   const onButtonClick = () => {
 
     // on demande a l'api de chercher les joueurs sans clan qui correspondent au prérequis du clanTag"
-    axios.put(`${window.location.origin}/api/put/searchPlayerWithNoClan`, clanTag)
+    axios.put(`${window.location.origin}/api/get/searchPlayerWithNoClan/${clanTag.slice(1)}`)
       .then((response) => {
-        console.log(response.data);
+        setPlayerData(response.data)
       })
       .catch((error) => {
         console.log(error);
@@ -33,6 +34,7 @@ export default function Home() {
             <p className="text-1xl">entrez le tag de votre clan, pour avoir des recommandation de joueurs correspondant</p>
             <input className="w-32 text-black" placeholder="#..." type="text" name="clanTag" onChange={onClanTagChange} value={clanTag}/>
             <button className="bg-gray-700 hover:bg-gray-600 text-white font-bold py-2 px-4 rounded" onClick={onButtonClick}>trouve moi des joueurs</button>
+            {playerData && <div>{playerData}</div> }
           </div>
         </div>
     </>
