@@ -45,12 +45,6 @@ router.get("/:param", (req, res) => {
                 res.json(result[0])
             })
         });
-
-
-        
-
-        res.json(clanData)
-        return
     })
     .catch((error) => {
 
