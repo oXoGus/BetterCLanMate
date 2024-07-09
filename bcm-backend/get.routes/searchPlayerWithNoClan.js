@@ -35,6 +35,8 @@ router.get("/:param", (req, res) => {
                 res.send("Erreur de connexion : " + err.stack);
                 return;
             }
+            
+            console.log("Connecté en tant que : " + connection.threadId);
 
             connection.query("SELECT id FROM joueursFR WHERE clanID IS NULL AND hdv > ? AND tr > ? ORDER BY noClanDuration DESC LIMIT 1; ", [clanData["requiredTrophies"], clanData["requiredTownhallLevel"]], (err, result) => {
                 if(err){
