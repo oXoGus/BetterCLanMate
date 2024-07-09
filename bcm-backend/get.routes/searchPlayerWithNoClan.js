@@ -36,13 +36,13 @@ router.get("/:param", (req, res) => {
                 return;
             }
 
-            connection.query("SELECT id FROM joueursFR WHERE clanID IS NULL AND hdv > ? AND tr > ? ORDER BY noClanDuration DESC; ", [clanData["requiredTrophies"], clanData["requiredTownhallLevel"]], (err, result) => {
+            connection.query("SELECT id FROM joueursFR WHERE clanID IS NULL AND hdv > ? AND tr > ? ORDER BY noClanDuration DESC LIMIT 1; ", [clanData["requiredTrophies"], clanData["requiredTownhallLevel"]], (err, result) => {
                 if(err){
                     console.log("Erreur de requête : " + err.stack)
                     res.send("Erreur de requête : " + err.stack);
                     return;
                 }
-                res.json(result)
+                res.json(result[0])
             })
         });
 
