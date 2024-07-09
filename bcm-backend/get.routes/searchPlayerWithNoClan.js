@@ -7,6 +7,10 @@ const router = express.Router() // on cherche l'url sur laquelle on est pour tra
 
 dotenv.config()
 
+const apiHeader = {
+    'authorization' : process.env.API_KEY
+}
+
 router.get("/:param", (req, res) => {
 
     // on verif que le tag du clan est valide
@@ -15,9 +19,11 @@ router.get("/:param", (req, res) => {
     // on retire le #
     clanTag = clanTag.substring(1);
 
-    axios.get(`https://api.clashofclans.com/v1/clans/%23${clanTag}`)
+    axios.get(`https://api.clashofclans.com/v1/clans/%23${clanTag}`, {headers : apiHeader})
     .then((response) => {
-        console.log(response.data);
+        clanData = response.data
+        clanData = clanData.JSON.loads()
+        console.log(clanData);
     })
     .catch((error) => {
         console.log(error);
