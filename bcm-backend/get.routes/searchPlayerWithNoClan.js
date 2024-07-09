@@ -14,29 +14,29 @@ const apiHeader = {
 router.get("/:param", (req, res) => {
 
     // on verif que le tag du clan est valide
-    clanTag = req.params.param;
+    let clanTag = req.params.param;
 
     axios.get(`https://api.clashofclans.com/v1/clans/%23${clanTag}`, {headers : apiHeader})
     .then((response) => {
 
-        // si le existe bien 
+        // si le clan existe bien 
         const clanData = response.data;
+
+        const connection  = mysql.createConnection({
+            host: process.env.HOST,
+            user: process.env.USERr,
+            password: process.env.PASSWORD,
+            database: process.env.DATABASE,
+            });
+    
+        res.json(clanData)
     })
     .catch((error) => {
 
         // si le clan n'existe pas
         res.status(404).json({message : "le clan n'existe pas"})
     });
-
-    // on 
-    const connection  = mysql.createConnection({
-        host: process.env.HOST,
-        user: process.env.USERr,
-        password: process.env.PASSWORD,
-        database: process.env.DATABASE,
-        });
-
-    res.json(clanData)
+    
 
 })
 
