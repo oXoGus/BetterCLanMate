@@ -40,7 +40,7 @@ router.get("/:param", (req, res) => {
             
             // on part du principe que le joueur n'a pas rejoint de clan entre temps 
             // TODO : on init un var clanID en true et on entre dans une boucle tant que le joueur a rejoint un clan enter temps on recherche le joueurs suivant et on supprime le precedent
-            connection.query("SELECT id, noClanDuration FROM joueursFR WHERE clanID IS NULL AND hdv > ? AND tr > ? ORDER BY noClanDuration DESC LIMIT 1; ", [clanData["requiredTownhallLevel"], clanData["requiredTrophies"]], (err, result) => {
+            connection.query("SELECT id, noClanDuration FROM joueursFR WHERE clanID IS NULL AND hdv > ? AND tr > ? AND inviteTimestamp IS NULL ORDER BY noClanDuration DESC LIMIT 1; ", [clanData["requiredTownhallLevel"], clanData["requiredTrophies"]], (err, result) => {
                 if(err){
                     connection.end();
                     console.log("Erreur de requête : " + err.stack)
@@ -49,7 +49,7 @@ router.get("/:param", (req, res) => {
                 }
 
                 if (result.length == 0) {
-                    res.json({message : "aucun joueur ne correspond aux critères de votre clan"})
+                    res.status(403).json({message : "aucun joueur ne correspond aux critères de votre clan"})
                     connection.end();
                     return
                 }       
@@ -59,12 +59,12 @@ router.get("/:param", (req, res) => {
                 axios.get(`https://api.clashofclans.com/v1/players/%23${playerID}`, {headers : apiHeader})
                 .then((response) => {
                     connection.end();
-                    res.json([response.data, result[0]])
+                    res.status(200).json([response.data, result[0]])
                     return
                 })
                 .catch((error) => {
                     connection.end();
-                    res.json({message : "la requête a echoué", error : error})
+                    res.status(500).json({message : "la requête a echoué", error : error})
                     return
                 })
 
@@ -72,9 +72,9 @@ router.get("/:param", (req, res) => {
         });
     })
     .catch((error) => {
-
+        console.log(error)
         // si le clan n'existe pas
-        res.status(404).json({message : "le clan n'existe pas"})
+        res.status(422).json({message : "le clan n'existe pas"})
         return
     });
     

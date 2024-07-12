@@ -104,29 +104,31 @@ while 1:
                     
 
                     try:
-                        player['clan'] #si le joueur est toujour dans un clan
-                        
-                        playerData = {
-                            'id' : player['tag'],
-                            'rate' : 0,
-                            'hdv' : player['townHallLevel'],
-                            'tr' : player['trophies'],
-                            'xp' : player['expLevel'],
-                            'donation' : player['achievements'][14]['value'],
-                            'jdc' : player['achievements'][31]['value'],
-                            'warStars' : player['warStars'],
-                            'clanID' : player['clan']['tag'],
-                            'label1' : playerLabels1,
-                            'label2' : playerLabels2,
-                            'label3' : playerLabels3,
-                            'noClanDuration' : None
-                        }
                         
 
-                        # on met a jour les donnée               
-                        cur.execute('UPDATE joueursFR SET id = %(id)s, rate = %(rate)s, hdv = %(hdv)s, tr = %(tr)s, xp = %(xp)s, donation = %(donation)s, jdc = %(jdc)s, warStars = %(warStars)s, clanID = %(clanID)s, noClanDuration = %(noClanDuration)s, label1 = %(label1)s, label2 = %(label2)s, label3 = %(label3)s, lastChecked = CURRENT_TIMESTAMP WHERE id = %(id)s', (playerData))
-                        conn.commit()
-                        #print(f"player {player['tag']} updated !")
+                            player['clan'] #si le joueur est toujour dans un clan
+                            
+                            playerData = {
+                                'id' : player['tag'],
+                                'rate' : 0,
+                                'hdv' : player['townHallLevel'],
+                                'tr' : player['trophies'],
+                                'xp' : player['expLevel'],
+                                'donation' : player['achievements'][14]['value'],
+                                'jdc' : player['achievements'][31]['value'],
+                                'warStars' : player['warStars'],
+                                'clanID' : player['clan']['tag'],
+                                'label1' : playerLabels1,
+                                'label2' : playerLabels2,
+                                'label3' : playerLabels3,
+                                'noClanDuration' : None
+                            }
+                            
+
+                            # on met a jour les donnée               
+                            cur.execute('UPDATE joueursFR SET id = %(id)s, rate = %(rate)s, hdv = %(hdv)s, tr = %(tr)s, xp = %(xp)s, donation = %(donation)s, jdc = %(jdc)s, warStars = %(warStars)s, clanID = %(clanID)s, noClanDuration = %(noClanDuration)s, label1 = %(label1)s, label2 = %(label2)s, label3 = %(label3)s, lastChecked = CURRENT_TIMESTAMP WHERE id = %(id)s', (playerData))
+                            conn.commit()
+                            #print(f"player {player['tag']} updated !")
 
                     except KeyError:
                         
@@ -148,14 +150,21 @@ while 1:
                             'label3' : playerLabels3
                         }
 
+                        # si le joueur n'est pas inactif
+                        if player["attackWins"] != 0 :
 
-                        #print(playerData)
+                            #print(playerData)
 
-                        # on met a jour les donnée               
-                        cur.execute('UPDATE joueursFR SET id = %(id)s, rate = %(rate)s, hdv = %(hdv)s, tr = %(tr)s, xp = %(xp)s, donation = %(donation)s, jdc = %(jdc)s, warStars = %(warStars)s, clanID = %(clanID)s, noClanDuration = CURRENT_TIMESTAMP, label1 = %(label1)s, label2 = %(label2)s, label3 = %(label3)s, lastChecked = CURRENT_TIMESTAMP WHERE id = %(id)s', (playerData))
-                        conn.commit()
-        
-                        #print(f"player {player['tag']} n'a pas de clan !")
+                            # on met a jour les donnée               
+                            cur.execute('UPDATE joueursFR SET id = %(id)s, rate = %(rate)s, hdv = %(hdv)s, tr = %(tr)s, xp = %(xp)s, donation = %(donation)s, jdc = %(jdc)s, warStars = %(warStars)s, clanID = %(clanID)s, noClanDuration = CURRENT_TIMESTAMP, label1 = %(label1)s, label2 = %(label2)s, label3 = %(label3)s, lastChecked = CURRENT_TIMESTAMP WHERE id = %(id)s', (playerData))
+                            conn.commit()
+            
+                            #print(f"player {player['tag']} n'a pas de clan !")
+                        else :
+                             # on met a jour son lastChecked comme ca on a plus a faire a lui              
+                            cur.execute("UPDATE joueursFR SET clanID = 'inactif', noClanDuration = %(noClanDuration)s ,lastChecked = CURRENT_TIMESTAMP WHERE id = %(id)s", (playerData))
+                            conn.commit()
 
+                        
                 except Exception:
                     traceback.print_exc() # on affiche les erreur

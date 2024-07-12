@@ -16,4 +16,10 @@ app.get('/', (req, res) => {
 const searchPlayerWithNoClan = require('./get.routes/searchPlayerWithNoClan')
 app.use("/get/searchPlayerWithNoClan", searchPlayerWithNoClan)
 
+const deletePlayerWithNoClan = require('./get.routes/deletePlayerWithNoClan')
+app.use("/get/deletePlayerWithNoClan", deletePlayerWithNoClan)
+
+const markPlayerChecked = require('./get.routes/markPlayerChecked')
+app.use("/get/markPlayerChecked", markPlayerChecked)
+
 app.listen(port, () => {console.log("le serveur est en ligne !")}) // on demare le serveur sur le port et on envoie un message dans les log

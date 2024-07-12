@@ -3,9 +3,23 @@
 @tailwind utilities;
 
 
-base {
-  color: inherit;
-  font-family: inherit;
-  font-size: inherit;
-  line-height: inherit;
+* {
+  @apply transition-colors duration-100 
+  fadeInUp
+}
+
+@keyframes fadeInUp {
+  0%{
+    opacity: 0;
+    transform: translateY(20px);
+  }
+   
+  100% {
+    opacity: 1;
+    transform: translateY(0px);
+  }
+}
+
+.fadeInUp {
+  animation: fadeInUp 1s ease-in-out;
 }
