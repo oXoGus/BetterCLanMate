@@ -34,7 +34,6 @@ export default function Home() {
   const [atk, setAtk] = useState(null);
   const [atkRate, setAtkRate] = useState(null)
   const [jdc, setJdc] = useState(null);
-  const [donation, setDonation] = useState(null);
   const [warStars, setWarStars] = useState(null);
   const [noClanDuration, setNoClanDuration] = useState();
   const [heros, setHeros] = useState(null);
@@ -133,11 +132,11 @@ export default function Home() {
 
       setAtk(playerData[0].attackWins);
 
+
       // on arrondi a 10^-1
       setAtkRate((playerData[0].attackWins/daysToAtk).toFixed(1))
 
       setJdc(playerData[0].achievements[31].value)
-      setDonation(playerData[0].donations)
       setWarStars(playerData[0].warStars)
 
       // on convertie le timestamp en forma lisible 
@@ -205,7 +204,10 @@ export default function Home() {
 
   const blackListNewPlayer = () => {
     setBlackListedLoading(true)
-    axios.get(`${window.location.origin}/api/get/deletePlayerWithNoClan/${id.slice(1)}`, { timeout: 10000 })
+    const data = {
+      id: id
+    }
+    axios.put(`${window.location.origin}/api/put/blackListPlayerWithNoClan/`, data)
       .then((response) => {
         setBlackListedLoading(false)
         setBlackListed(true)
@@ -241,7 +243,10 @@ export default function Home() {
   }, [markPlayerInvited])
 
   const markNewPlayerInvited = () => {
-    axios.get(`${window.location.origin}/api/get/markPlayerChecked/${id.slice(1)}`, { timeout: 10000 })
+    const data = {
+      id: id
+    }
+    axios.put(`${window.location.origin}/api/put/markPlayerChecked`, data)
       .then((response) => {
         // on recherche un nouveau joueur
         searchPlayer()
@@ -293,10 +298,10 @@ export default function Home() {
               <p className="m-2">niveau {xp}</p>
               <p className="m-2">{atk} attaques</p>
               <p className="m-2">{atkRate} attaques/jours</p>
-
+              <p className="m-2">{warStars} étoiles gagnées en gdc</p>
             </div>
             <div className="flex justify-between m-10">
-              <button className=" dark:text-white text-black bg-red-500 hover:bg-red-600 font-semibold py-2 px-4 rounded" onClick={onButtonForBlackListPlayerClick}>pas de ca dans mon clan"</button>
+              <button className=" dark:text-white text-black bg-red-500 hover:bg-red-600 font-semibold py-2 px-4 rounded" onClick={onButtonForBlackListPlayerClick}>pas de ca dans mon clan</button>
               <a className="dark:bg-gray-700 dark:hover:bg-gray-600 dark:text-white text-black bg-slate-200 hover:bg-slate-300 font-bold py-2 px-4 rounded" href={`https://link.clashofclans.com/?action=OpenPlayerProfile&tag=%23${id.slice(1)}`} >voir sur le jeu</a>
               <button className=" dark:text-white text-black bg-green-500 hover:bg-green-600 font-semibold py-2 px-4 rounded" onClick={onButtonForMarkPlayerInvitedClick}>c'est invité, au suivant !</button>
             </div>

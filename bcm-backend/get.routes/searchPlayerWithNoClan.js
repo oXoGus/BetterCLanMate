@@ -36,7 +36,6 @@ router.get("/:param", (req, res) => {
                 return;
             }
             
-            console.log("Connecté en tant que : " + connection.threadId);
             
             // on part du principe que le joueur n'a pas rejoint de clan entre temps 
             // TODO : on init un var clanID en true et on entre dans une boucle tant que le joueur a rejoint un clan enter temps on recherche le joueurs suivant et on supprime le precedent

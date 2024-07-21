@@ -7,16 +7,11 @@ const router = express.Router() // on cherche l'url sur laquelle on est pour tra
 
 dotenv.config()
 
-const apiHeader = {
-    'authorization' : process.env.API_KEY
-}
-
-router.get("/:param", (req, res) => {
+router.put("/", (req, res) => {
 
     // on verif que le tag du clan est valide
-    const plaverTag = '#'+req.params.param;
+    const playerTag = req.body.id;
 
-    
 
     const connection  = mysql.createConnection({
         host: process.env.HOST,
@@ -31,9 +26,9 @@ router.get("/:param", (req, res) => {
             res.send("Erreur de connexion : " + err.stack);
             return;
         }
+            
         
-
-        connection.query("UPDATE joueursFR SET inviteTimestamp = CURRENT_TIMESTAMP WHERE id = ?", [plaverTag], (err, result) => {
+        connection.query("UPDATE joueursFR SET clanID = 'blacklist', noClanDuration = ?, lastChecked = CURRENT_TIMESTAMP WHERE id = ?", [null, playerTag], (err, result) => {
             if(err){
                 connection.end();
                 console.log("Erreur de requête : " + err.stack)
@@ -41,7 +36,7 @@ router.get("/:param", (req, res) => {
                 return;
             }
             connection.end()
-            res.status(200).json({message : `le joueur ${plaverTag} a bien été marqué comme invité`})
+            res.status(200).json({message : `le joueur ${playerTag} a bien été blacklisté`})
             return
             })
         });
