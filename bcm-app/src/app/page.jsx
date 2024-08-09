@@ -5,7 +5,8 @@ import axios from "axios";
 import { useEffect, useRef, useState } from "react";
 import Navbar from "../components/Navbar";
 import HighlightedText from "../components/HighlightedText";
-import './globals.css';
+import Image from "next/image"
+import './animation.css';
 
 
 export default function Home() {
@@ -306,6 +307,7 @@ export default function Home() {
               <p className="m-2">{atk} attaques</p>
               <p className="m-2">{atkRate} attaques/jours</p>
               <p className="m-2">{warStars} étoiles gagnées en gdc</p>
+              <Image src="./img/Apprentice Warden.png" width="200px" hei/>
             </div>
             <div className="flex justify-between m-10">
               <button className=" dark:text-white text-black bg-red-500 hover:bg-red-600 font-semibold py-2 px-4 rounded" onClick={onButtonForBlackListPlayerClick}>pas de ca dans mon clan</button>
@@ -344,11 +346,12 @@ export default function Home() {
                   style={{ transition: 'width 0.2s' }}
                 />
               </div>
-              <button className="dark:bg-gray-700 dark:hover:bg-gray-600 dark:text-white text-black bg-[#FF7700] hover:bg-[#FFF1E2] font-semibold " onClick={onButtonForSearchPlayerClick}>trouve moi des joueurs</button>
+              <div>
+                <button className="dark:bg-gray-700 dark:hover:bg-gray-600 dark:text-white text-black bg-[#FF7700] hover:bg-[#FFF1E2] font-semibold " onClick={onButtonForSearchPlayerClick}>{loading ? "..." : "trouve moi des joueurs"}</button>
+              </div>
               {errorBadClanTag && <p className="text-red-600 font-bold error">tag du clan invalide !</p> }
               {noPlayerMatch && <p className="text-red-600 font-bold error">aucun joueur trouvé, réessayez plus tard</p> }
               {apiError && <p className="text-red-600 font-bold error">réessayez plus tard</p> }
-              {loading ? <p>chargment...</p> : <p className="text-white dark:text-gray-800 ">-</p>}
             </div>
           </div>
         }

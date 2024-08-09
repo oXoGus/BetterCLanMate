@@ -1,0 +1,25 @@
+@keyframes errorAnimation {
+    20%{
+      transform: translateX(-5px);
+    }
+    40%{
+      transform: translateX(5px);
+    }
+    60%{
+      transform: translateX(-5px);
+    }
+    80%{
+      transform: translateX(5px);
+    }
+    100%{
+      transform: translateX(-5px);
+    }
+  }
+  
+.error {
+    animation: errorAnimation 0.5s ease-in-out;
+}
+ 
+.loadingButton {
+    @apply transition-transform duration-100;
+}
