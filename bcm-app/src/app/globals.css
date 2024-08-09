@@ -2,7 +2,7 @@
 @tailwind components;
 @tailwind utilities;
 
-
+/*
 * {
   @apply transition-colors duration-100 
   fadeInUp
@@ -23,3 +23,27 @@
 .fadeInUp {
   animation: fadeInUp 1s ease-in-out;
 }
+*/
+
+@keyframes errorAnimation {
+  20%{
+    transform: translateX(-5px);
+  }
+  40%{
+    transform: translateX(5px);
+  }
+  60%{
+    transform: translateX(-5px);
+  }
+  80%{
+    transform: translateX(5px);
+  }
+  100%{
+    transform: translateX(-5px);
+  }
+}
+
+.error {
+  animation: errorAnimation 0.5s ease-in-out;
+}
+

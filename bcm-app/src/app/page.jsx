@@ -2,11 +2,18 @@
 
 
 import axios from "axios";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import Navbar from "../components/Navbar";
+import HighlightedText from "../components/HighlightedText";
+import './globals.css';
+
 
 export default function Home() {
   
+  const spanRef = useRef(null);
+  const underlineRef = useRef(null);
+
+
   const [playerInvitedByPass, setPlayerInvitedByPass] =useState(false)
   const [markPlayerInvited, setMarkPlayerInvited] = useState(false)
   const [blackListedLoading, setBlackListedLoading] = useState(false)
@@ -53,11 +60,21 @@ export default function Home() {
   }
 
 
+  /* on met la largeur du soulignement a la largeur du spam (du text) dès que le text change  */
+  useEffect(() => {
+    if (spanRef.current && underlineRef.current && spanRef.current.offsetWidth < 210) {
+      underlineRef.current.style.width = `${spanRef.current.offsetWidth}px`;
+    }
+  }, [clanTag]);
+
   /*********  searchPlayer without clan data fetching *********/ 
 
 
   const searchPlayer = () => {
     setLoading(true)
+    setApiError(false)
+    setErrorBadClanTag(false)
+    setNoPlayerMatch(false)
     // on demande a l'api de chercher les joueurs sans clan qui correspondent au prérequis du clanTag
     axios.get(`${window.location.origin}/api/get/searchPlayerWithNoClan/${clanTag.slice(1)}`, { timeout: 10000 })
       .then((response) => {
@@ -259,31 +276,21 @@ export default function Home() {
    /*   */
   return (
     <div className={darkMode ? "dark" : ""}>
-      <div className="fixed inset-0 bg-white text-black dark:text-white dark:bg-gray-800">
-        <nav className="dark:bg-gray-900 bg-slate-100">
-              <div className="dark:text-gray-100 text-gray-900 text-4xl p-3 flex justify-between">
-                  <a className="" href="/">BetterClanMate</a>
-                  <button className="bg-neutral-900 dark:bg-white rounded text-white text-xl dark:text-black font-semibold p-1" onClick={changeDarkMode}>
-                    {darkMode ? "mode clair" : "mode sombre"}
-                  </button>
-              </div>
-        </nav>
+      <div className="fixed inset-0 w-full bg-[#FFF1E2] text-black dark:text-white dark:bg-gray-800">
+        <div className="dark:text-gray-100 text-gray-900 sm:text-5xl md:text-4xl p-3 flex justify-between">
+            <div>
+              <a className="font-semibold" href="/">BetterClanMate</a>
+              <svg width="280" height="8" fill="none" >
+                <rect width="280" height="8" fill="#FF7700"/>
+              </svg>
+            </div>
+            <button className="bg-neutral-900 dark:bg-white rounded text-white text-xl dark:text-black font-semibold p-1" onClick={changeDarkMode}>
+            {darkMode ? "mode clair" : "mode sombre"}
+          </button>
+        </div>
         {/*  partie dynamique  */}
         {/*  tant qu'on a pas reçus les données du joueur  */}
-        {
-          !playerDataReceive &&
-          <div className=" dark:text-white flex">
-            <div className="flex items-center flex-col w-full p-3 space-y-2">
-              <p className="text-1xl font-semibold">entrez le tag de votre clan</p>
-              <input className="border-2 border-gray-400 rounded w-32 text-black" placeholder="#..." type="text" name="clanTag" onChange={onClanTagChange} value={clanTag}/>
-              <button className="dark:bg-gray-700 dark:hover:bg-gray-600 dark:text-white text-black bg-slate-200 hover:bg-slate-300 font-bold py-2 px-4 rounded" onClick={onButtonForSearchPlayerClick}>trouve moi des joueurs</button>
-              {errorBadClanTag && <p className="text-red-600 font-bold">tag du clan invalide !</p> }
-              {noPlayerMatch && <p className="text-red-600 font-bold">aucun joueur trouvé, réessayez plus tard</p> }
-              {apiError && <p className="text-red-600 font-bold">réessayez plus tard</p> }
-              {loading ? <p>chargment...</p> : <p className="text-white dark:text-gray-800">-</p>}
-            </div>
-          </div>
-        }
+        
 
         {
           playerDataReceive ? 
@@ -309,11 +316,40 @@ export default function Home() {
           </div>
 
           :
-          
-        
-          <div className="flex items-center flex-col">
-            <p></p>
-            <img src="https://www.clashofstats.com/images/characters/large/1x/skeleton.png" className="mt-7"></img>
+
+          <div className=" dark:text-white flex">
+            <div className="flex items-start flex-col p-3 space-y-2 mt-20 ml-auto mr-auto">
+              <span className="relative font-semibold text-1xl">entrez <HighlightedText text={'le tag de votre clan'} color={'#FF7700'} customHeight={"25px"}/>.</span>
+              <div className="relative inline-block">
+                <input
+                  className="border-0 bg-inherit w-[205px] focus:outline-none focus:ring-0 "
+                  placeholder="#..."
+                  type="text"
+                  name="clanTag"
+                  spellCheck="false"
+                  value={clanTag}
+                  onChange={onClanTagChange}
+                  style={{ paddingBottom: '1px' }} // Ajoute un peu d'espace pour le soulignement
+                />
+                <span
+                  ref={spanRef}
+                  className="absolute top-0 left-0 invisible whitespace-pre"
+                  style={{ fontFamily: 'inherit', fontSize: 'inherit' }}
+                >
+                  {clanTag || "#..."}
+                </span>
+                <div
+                  ref={underlineRef}
+                  className="absolute left-0 bottom-0 h-[3px] bg-[#FF7700] hover:bg-[#FFF1E2]"
+                  style={{ transition: 'width 0.2s' }}
+                />
+              </div>
+              <button className="dark:bg-gray-700 dark:hover:bg-gray-600 dark:text-white text-black bg-[#FF7700] hover:bg-[#FFF1E2] font-semibold " onClick={onButtonForSearchPlayerClick}>trouve moi des joueurs</button>
+              {errorBadClanTag && <p className="text-red-600 font-bold error">tag du clan invalide !</p> }
+              {noPlayerMatch && <p className="text-red-600 font-bold error">aucun joueur trouvé, réessayez plus tard</p> }
+              {apiError && <p className="text-red-600 font-bold error">réessayez plus tard</p> }
+              {loading ? <p>chargment...</p> : <p className="text-white dark:text-gray-800 ">-</p>}
+            </div>
           </div>
         }
       </div>
