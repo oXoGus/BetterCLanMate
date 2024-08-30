@@ -73,7 +73,7 @@ router.get("/:param", (req, res) => {
     .catch((error) => {
         console.log(error)
         // si le clan n'existe pas
-        res.status(422).json({message : "le clan n'existe pas"})
+        res.status(422).json({message : "le clan n'existe pas", error})
         return
     });
     

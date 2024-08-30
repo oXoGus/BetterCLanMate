@@ -7,6 +7,9 @@ import Navbar from "../components/Navbar";
 import HighlightedText from "../components/HighlightedText";
 import Image from "next/image"
 import './animation.css';
+import UnderlineText from "../components/UnderlineText";
+import SemiHighlightedText from "../components/SemiHighlightedText";
+
 
 
 export default function Home() {
@@ -36,6 +39,7 @@ export default function Home() {
   // les useState pour les stats du joueurs
   const [id, setId] = useState(null);
   const [hdv, setHdv] = useState(null);
+  const [townHallWeaponLevel, setTownHallWeaponLevel] = useState(null);
   const [userName, setUserName] = useState(null);
   const [tr, setTr] = useState(null);
   const [xp, setXp] = useState(null);
@@ -141,6 +145,11 @@ export default function Home() {
       setTr(playerData[0].trophies);
       setXp(playerData[0].expLevel);
 
+
+      // si le joueur a un townHallWeaponLevel alors on le save
+      if (playerData[0].townHallLevel >= 12) {
+        setTownHallWeaponLevel(playerData[0].townHallWeaponLevel);
+      }
 
     // on calcule de nb d'attaque par jour en prennant 
       
@@ -280,10 +289,7 @@ export default function Home() {
       <div className="fixed inset-0 w-full bg-[#FFF1E2] text-black dark:text-white dark:bg-gray-800">
         <div className="dark:text-gray-100 text-gray-900 sm:text-5xl md:text-4xl p-3 flex justify-between">
             <div>
-              <a className="font-semibold" href="/">BetterClanMate</a>
-              <svg width="280" height="8" fill="none" >
-                <rect width="280" height="8" fill="#FF7700"/>
-              </svg>
+              <a className="font-semibold" href="/"><UnderlineText text={"BetterClanMate"} color={'#FF7700'} customHeight={"7px"}/></a>
             </div>
             <button className="bg-neutral-900 dark:bg-white rounded text-white text-xl dark:text-black font-semibold p-1" onClick={changeDarkMode}>
             {darkMode ? "mode clair" : "mode sombre"}
@@ -295,26 +301,37 @@ export default function Home() {
 
         {
           playerDataReceive ? 
-          <div>
-            <div className="flex justify-between m-10">
-              <p className="text-2xl">{userName}</p>
-              <p className="text-xl font-bold">détecté sans clan depuis : {noClanDuration}</p>
+          <div className="">
+            <div className="bg-white m-5 rounded-2xl p-3">
+              <div className="flex justify-between">
+              <div className="relative w-[167px] h-[183px]">
+                  <Image src={townHallWeaponLevel ? `/img/hdv${hdv}-${townHallWeaponLevel}.png` : `/img/hdv${hdv}.png` } layout="fill" objectFit="cover" alt="hdv" className="z-0" loading="lazy"/>
+                  <p className=" absolute inset-0 text-2xl mb-4"><HighlightedText text={userName} color={'#FF7700'} customHeight={"35px"}/></p>
+                </div>
+                <p className="text-xl font-bold">détecté sans clan depuis : {noClanDuration}</p>
+              </div>
+              <div className="flex">
+                
+                <div className="flex items-center m-5">
+                  <img src="/img/xp.png" className="h-[25px]"/>
+                  <p className="m-1"><SemiHighlightedText text={`${xp}`} color={'#FF7700'} customHeight={"7px"}/></p>
+                </div>
+
+                <div className="flex items-center m-5">
+                  <p className="m-1"><SemiHighlightedText text={`${tr}`} color={'#FF7700'} customHeight={"7px"}/></p>
+                  <img src="/img/tr.png" className="h-[25px]"/>
+                </div>
+                
+                <p className="m-2"><SemiHighlightedText text={atk > 1 ? `${atk} attaques` : `${atk} attaque`} color={'#FF7700'} customHeight={"7px"}/></p>
+                <p className="m-2">{atkRate} attaques/jours</p>
+                <p className="m-2">{warStars} étoiles gagnées en gdc</p>
+              </div>
+              <div className="flex justify-between m-10">
+                <button className=" dark:text-white text-black bg-red-500 hover:bg-red-600 font-semibold py-2 px-4 rounded" onClick={onButtonForBlackListPlayerClick}>pas de ca dans mon clan</button>
+                <a className="dark:bg-gray-700 dark:hover:bg-gray-600 dark:text-white text-black bg-slate-200 hover:bg-slate-300 font-bold py-2 px-4 rounded" href={`https://link.clashofclans.com/?action=OpenPlayerProfile&tag=%23${id.slice(1)}`} >voir sur le jeu</a>
+                <button className=" dark:text-white text-black bg-green-500 hover:bg-green-600 font-semibold py-2 px-4 rounded" onClick={onButtonForMarkPlayerInvitedClick}>c'est invité, au suivant !</button>
+              </div>
             </div>
-            <div className="flex m-10">
-              <p className="m-2"> hdv : {hdv}</p>
-              <p className="m-2">{tr} tr</p>
-              <p className="m-2">niveau {xp}</p>
-              <p className="m-2">{atk} attaques</p>
-              <p className="m-2">{atkRate} attaques/jours</p>
-              <p className="m-2">{warStars} étoiles gagnées en gdc</p>
-              <Image src="./img/Apprentice Warden.png" width="200px" hei/>
-            </div>
-            <div className="flex justify-between m-10">
-              <button className=" dark:text-white text-black bg-red-500 hover:bg-red-600 font-semibold py-2 px-4 rounded" onClick={onButtonForBlackListPlayerClick}>pas de ca dans mon clan</button>
-              <a className="dark:bg-gray-700 dark:hover:bg-gray-600 dark:text-white text-black bg-slate-200 hover:bg-slate-300 font-bold py-2 px-4 rounded" href={`https://link.clashofclans.com/?action=OpenPlayerProfile&tag=%23${id.slice(1)}`} >voir sur le jeu</a>
-              <button className=" dark:text-white text-black bg-green-500 hover:bg-green-600 font-semibold py-2 px-4 rounded" onClick={onButtonForMarkPlayerInvitedClick}>c'est invité, au suivant !</button>
-            </div>
-            
           </div>
 
           :
