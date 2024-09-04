@@ -35,6 +35,7 @@ export default function Home() {
   const [errorBadClanTag, setErrorBadClanTag] = useState(false)
   const [darkMode, setDarkMode] = useState(false)
   const [byPass, setByPass] = useState(false)
+  const [windowHeight, setWindowHeight] =useState(null);
 
   // les useState pour les stats du joueurs
   const [id, setId] = useState(null);
@@ -54,6 +55,13 @@ export default function Home() {
   const [pets, setPets] =useState();
   const [siegeEngine, setSiegeEngine] = useState();
 
+  // les couleur 
+  const red = 230;
+  const vert = 196; 
+  const [xpColor, setXpColor] = useState(null);
+  const [trColor, setTrColor] = useState(null);
+
+
   const onClanTagChange = (event) => {
     setClanTag(event.target.value);
   }
@@ -71,6 +79,10 @@ export default function Home() {
       underlineRef.current.style.width = `${spanRef.current.offsetWidth}px`;
     }
   }, [clanTag]);
+
+  useEffect(() => {
+    setWindowHeight(window.innerHeight)
+  }, [window.innerHeight])
 
   /*********  searchPlayer without clan data fetching *********/ 
 
@@ -123,6 +135,16 @@ export default function Home() {
 
   }
 
+  function rgbToHex(r, g, b) {
+    // Convertit une valeur en hexadécimal et assure qu'elle est sur deux chiffres
+    const toHex = (value) => {
+      const hex = value.toString(16);
+      return hex.length === 1 ? '0' + hex : hex;
+    };
+  
+    // Concatène les valeurs hexadécimales
+    return '#' + toHex(r) + toHex(g) + toHex(b);
+  }
 
 
   useEffect(() => {
@@ -144,6 +166,38 @@ export default function Home() {
       setHdv(playerData[0].townHallLevel);
       setTr(playerData[0].trophies);
       setXp(playerData[0].expLevel);
+
+
+
+      // calcule des couleur 
+      
+      // pour l'xp
+      if (playerData[0].townHallLevel == 9){
+        if (playerData[0].expLevel > 85){
+          setXpColor(rgbToHex(0, 196, 0)) // vert
+        }
+        else if (playerData[0].expLevel < 60){
+          setXpColor(rgbToHex(230, 0, 0))
+        }
+        else {
+          let rate = 1/25
+          let r = red - 
+          setXpColor(rgbToHex(r, 0, 0)) // rouge 
+        }
+      } 
+      // hdv 2
+      else if (playerData[0].townHallLevel == 2){
+        if (playerData[0].expLevel > 15){
+          setXpColor(rgbToHex(0, 196, 0)) // vert
+        }
+        else if (playerData[0].expLevel > 15) {
+          setXpColor(rgbToHex(230, 0, 0)) // rouge 
+        }
+        else {
+
+        }
+      }
+      
 
 
       // si le joueur a un townHallWeaponLevel alors on le save
@@ -286,7 +340,7 @@ export default function Home() {
    /*   */
   return (
     <div className={darkMode ? "dark" : ""}>
-      <div className="fixed inset-0 w-full bg-[#FFF1E2] text-black dark:text-white dark:bg-gray-800">
+      <div className="absolute  lg:h-full md:h-auto w-full bg-[#FFF1E2] text-black dark:text-white dark:bg-gray-800">
         <div className="dark:text-gray-100 text-gray-900 sm:text-5xl md:text-4xl p-3 flex justify-between">
             <div>
               <a className="font-semibold" href="/"><UnderlineText text={"BetterClanMate"} color={'#FF7700'} customHeight={"7px"}/></a>
@@ -303,29 +357,38 @@ export default function Home() {
           playerDataReceive ? 
           <div className="">
             <div className="bg-white m-5 rounded-2xl p-3">
-              <div className="flex justify-between">
-              <div className="relative w-[167px] h-[183px]">
-                  <Image src={townHallWeaponLevel ? `/img/hdv${hdv}-${townHallWeaponLevel}.png` : `/img/hdv${hdv}.png` } layout="fill" objectFit="cover" alt="hdv" className="z-0" loading="lazy"/>
-                  <p className=" absolute inset-0 text-2xl mb-4"><HighlightedText text={userName} color={'#FF7700'} customHeight={"35px"}/></p>
-                </div>
-                <p className="text-xl font-bold">détecté sans clan depuis : {noClanDuration}</p>
-              </div>
-              <div className="flex">
-                
-                <div className="flex items-center m-5">
-                  <img src="/img/xp.png" className="h-[25px]"/>
-                  <p className="m-1"><SemiHighlightedText text={`${xp}`} color={'#FF7700'} customHeight={"7px"}/></p>
-                </div>
+                <div className="flex justify-between">
+                  <div className="relative w-[167px] h-[183px]">
+                    <img src={townHallWeaponLevel ? `/img/hdv${hdv}-${townHallWeaponLevel}.png` : `/img/hdv${hdv}.png` } className="z-0 h-full w-full" loading="lazy"/>
+                    <p className=" absolute inset-0 text-2xl mb-4"><HighlightedText text={userName} color={'#FF7700'} customHeight={"35px"}/></p>
+                  </div>
+                  <div className="flex flex-wrap justify-between mt-10">
+                    <div className="flex items-center m-3">
+                      <img src="/img/xp.png" className="h-[25px]"/>
+                      <SemiHighlightedText text={`${xp}`} color={'#FF7700'} customHeight={"7px"}/>
+                    </div>
 
-                <div className="flex items-center m-5">
-                  <p className="m-1"><SemiHighlightedText text={`${tr}`} color={'#FF7700'} customHeight={"7px"}/></p>
-                  <img src="/img/tr.png" className="h-[25px]"/>
+                    <div className="flex items-center m-3">
+                      <SemiHighlightedText text={`${tr}`} color={'#FF7700'} customHeight={"7px"}/>
+                      <img src="/img/tr.png" className="h-[25px]"/>
+                    </div>
+                    
+                    <div className="flex items-center m-3">
+                      <SemiHighlightedText text={atk > 1 ? `${atk}⚔ attaques` : `${atk}⚔ attaque`} color={'#FF7700'} customHeight={"7px"}/>
+                    </div>
+                    
+                    <div className="flex items-center m-3">
+                      <SemiHighlightedText text={`${atkRate} attaques/jours`} color={'#FF7700'} customHeight={"7px"}/>
+                    </div>
+
+                    <div className="flex items-center m-3">
+                      <SemiHighlightedText text={`${warStars} étoiles gagnées en gdc`} color={'#FF7700'} customHeight={"7px"}/>
+                    </div>
+                    
+                  </div>
+                  <p className="ml-auto text-right text-xl font-bold">détecté sans clan depuis : {noClanDuration}</p>
                 </div>
-                
-                <p className="m-2"><SemiHighlightedText text={atk > 1 ? `${atk} attaques` : `${atk} attaque`} color={'#FF7700'} customHeight={"7px"}/></p>
-                <p className="m-2">{atkRate} attaques/jours</p>
-                <p className="m-2">{warStars} étoiles gagnées en gdc</p>
-              </div>
+              
               <div className="flex justify-between m-10">
                 <button className=" dark:text-white text-black bg-red-500 hover:bg-red-600 font-semibold py-2 px-4 rounded" onClick={onButtonForBlackListPlayerClick}>pas de ca dans mon clan</button>
                 <a className="dark:bg-gray-700 dark:hover:bg-gray-600 dark:text-white text-black bg-slate-200 hover:bg-slate-300 font-bold py-2 px-4 rounded" href={`https://link.clashofclans.com/?action=OpenPlayerProfile&tag=%23${id.slice(1)}`} >voir sur le jeu</a>
@@ -336,7 +399,7 @@ export default function Home() {
 
           :
 
-          <div className=" dark:text-white flex">
+          <div className={`dark:text-white flex h-[654px]`}>
             <div className="flex items-start flex-col p-3 space-y-2 mt-20 ml-auto mr-auto">
               <span className="relative font-semibold text-1xl">entrez <HighlightedText text={'le tag de votre clan'} color={'#FF7700'} customHeight={"25px"}/>.</span>
               <div className="relative inline-block">
@@ -348,7 +411,7 @@ export default function Home() {
                   spellCheck="false"
                   value={clanTag}
                   onChange={onClanTagChange}
-                  style={{ paddingBottom: '1px' }} // Ajoute un peu d'espace pour le soulignement
+                  style={{ paddingBottom: '1px' }} // on ajoute un peu d'espace pour le soulignement
                 />
                 <span
                   ref={spanRef}
