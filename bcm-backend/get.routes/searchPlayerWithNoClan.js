@@ -58,7 +58,7 @@ router.get("/:param", (req, res) => {
                 axios.get(`https://api.clashofclans.com/v1/players/%23${playerID}`, {headers : apiHeader})
                 .then((response) => {
                     connection.end();
-                    res.status(200).json([response.data, result[0]])
+                    res.status(200).json([response.data, result[0], {"requiredTrophies" : clanData["requiredTrophies"], "requiredTownhallLevel" : clanData["requiredTownhallLevel"]}])
                     return
                 })
                 .catch((error) => {

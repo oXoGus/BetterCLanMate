@@ -36,6 +36,7 @@ export default function Home() {
   const [darkMode, setDarkMode] = useState(false)
   const [byPass, setByPass] = useState(false)
   const [windowHeight, setWindowHeight] =useState(null);
+  const [profileChecked, setProfileChecked] = useState(false)
 
   // les useState pour les stats du joueurs
   const [id, setId] = useState(null);
@@ -57,10 +58,18 @@ export default function Home() {
 
   // les couleur 
   const red = 230;
-  const vert = 196; 
+  const green = 196; 
+  const xpBornMin = [0, 5, 10, 10, 15, 20, 30, 50, 65, 75, 100, 140, 160, 180, 200, 220]
+  const xpBornMax = [10, 20, 25, 25, 35, 45, 55, 70, 90, 110, 140, 160, 180, 200, 220, 240]
   const [xpColor, setXpColor] = useState(null);
   const [trColor, setTrColor] = useState(null);
+  const [atkRateColor, setAtkRateColor] = useState(null);
+  const [warStarsColor, setWarStarsColor] = useState(null);
+  const [profileColor, setProfileColor] = useState(null);
 
+  const checkProfile = () => {
+    setProfileChecked(true);
+  }
 
   const onClanTagChange = (event) => {
     setClanTag(event.target.value);
@@ -171,41 +180,43 @@ export default function Home() {
 
       // calcule des couleur 
       
-      // pour l'xp
-      if (playerData[0].townHallLevel == 9){
-        if (playerData[0].expLevel > 85){
-          setXpColor(rgbToHex(0, 196, 0)) // vert
-        }
-        else if (playerData[0].expLevel < 60){
-          setXpColor(rgbToHex(230, 0, 0))
-        }
-        else {
-          let rate = 1/25
-          let r = red - 
-          setXpColor(rgbToHex(r, 0, 0)) // rouge 
-        }
-      } 
-      // hdv 2
-      else if (playerData[0].townHallLevel == 2){
-        if (playerData[0].expLevel > 15){
-          setXpColor(rgbToHex(0, 196, 0)) // vert
-        }
-        else if (playerData[0].expLevel > 15) {
-          setXpColor(rgbToHex(230, 0, 0)) // rouge 
-        }
-        else {
+      // pour l'xp sour un certain seuil dans le liste xpBorneMin selon l'hdv on met la couleur rouge 
+      // pareil avec la couleur verte avec la liste xpBorneMax 
+      // et quand c'est entre les deux on fait un dégradé entre le rouge et le vert qui dépend du rate 
+      
+      if (playerData[0].expLevel > xpBornMax[playerData[0].townHallLevel - 1]){
+        setXpColor(rgbToHex(0, green, 0)) // max green 
+      }
+      else if (playerData[0].expLevel < xpBornMin[playerData[0].townHallLevel - 1]){
+        setXpColor(rgbToHex(red, 0, 0)) // max red
+      }
+      else {
 
-        }
+        // le rate est le raport entre le nombre de niveau que le joueur doit gagner pour avoir la couleur verte max (la borne max) sur le nombre de niveau entre la couleur rouge et le vert max 
+        let rate = (1 / (xpBornMax[playerData[0].townHallLevel - 1] - xpBornMin[playerData[0].townHallLevel - 1]) * (playerData[0].expLevel - xpBornMin[playerData[0].townHallLevel - 1]));
+        
+        // équation de droite pour avoir la coposante rouge et verte du dégradé selon le rate qui est entre 0 et 1 
+        var rXp = parseInt(red - red * rate);
+        var gXp = parseInt(green * rate);
+        setXpColor(rgbToHex(rXp, gXp, 0))
+        //console.log(`rate : ${rate}, r : ${r}, g : ${g}`)
       }
       
+      //pour la couleur des tr c'est comme pour l'xp
+      if (playerData[0].trophies >= 5000){
+        setTrColor(rgbToHex(0, green, 0));
+      }
+      else {
+        let rate = (1 / (5000 - playerData[2].requiredTrophies) * (playerData[0].trophies - playerData[2].requiredTrophies))
 
+        var rTr = parseInt(red - red * rate);
+        var gTr = parseInt(green * rate);
 
-      // si le joueur a un townHallWeaponLevel alors on le save
-      if (playerData[0].townHallLevel >= 12) {
-        setTownHallWeaponLevel(playerData[0].townHallWeaponLevel);
+        setTrColor(rgbToHex(rTr, gTr , 0));
       }
 
-    // on calcule de nb d'attaque par jour en prennant 
+
+      // on calcule de nb d'attaque par jour en prennant comme ref le 1er jour du mois 
       
       const firstDayOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
 
@@ -213,12 +224,55 @@ export default function Home() {
 
       setAtk(playerData[0].attackWins);
 
-
+      let _atkRate = (playerData[0].attackWins/daysToAtk).toFixed(1)
       // on arrondi a 10^-1
-      setAtkRate((playerData[0].attackWins/daysToAtk).toFixed(1))
+      setAtkRate(_atkRate)
+
+      // pour l'atkRateColor
+      if (_atkRate >= 1 ) {
+        setAtkRateColor(rgbToHex(0, green, 0));
+      }
+      else {
+        var rAtkRate = parseInt(red - red * _atkRate);
+        var gAtkRate = parseInt(green * _atkRate);
+
+        setAtkRateColor(rgbToHex(rAtkRate, gAtkRate, 0));
+      }
+
 
       setJdc(playerData[0].achievements[31].value)
       setWarStars(playerData[0].warStars)
+
+      // pour les etoiles de gdc  
+      if (playerData[0].warStars > 1500){
+        setWarStarsColor(rgbToHex(0, green, 0));
+      }
+      else {
+        let rate = 1 / 1500 * playerData[0].warStars;
+
+        var rWarStars = parseInt(red - red * rate);
+        var gWarStars = parseInt(green * rate);
+
+        setWarStarsColor(rgbToHex(rWarStars, gWarStars, 0));
+      }
+
+      // la couleur moyenne du profile
+      var rMoy = parseInt((rXp + rTr + rAtkRate + rWarStars) / 4);
+      var gMoy = parseInt((gXp + gTr + gAtkRate + gWarStars) / 4);
+
+      console.log(`rXp : ${rXp}, rTr : ${rTr}, rAtkRate : ${rAtkRate}, rWarStars : ${rWarStars}`)
+      console.log(`rMoy : ${rMoy}, gMoy : ${gMoy} `)
+
+      setProfileColor(rgbToHex(rMoy, gMoy, 0));
+
+      // si le joueur a un townHallWeaponLevel alors on le save
+      if (playerData[0].townHallLevel >= 12) {
+        setTownHallWeaponLevel(playerData[0].townHallWeaponLevel);
+      }
+
+    
+
+      
 
       // on convertie le timestamp en forma lisible 
 
@@ -308,7 +362,7 @@ export default function Home() {
 
   const onButtonForMarkPlayerInvitedClick = () => {
     // on change l'état pour trigger le useEffect
-    
+    setProfileChecked(false)
     setMarkPlayerInvited(!markPlayerInvited)
     console.log(markPlayerInvited)
     if (!playerInvitedByPass){
@@ -365,34 +419,48 @@ export default function Home() {
                   <div className="flex flex-wrap justify-between mt-10">
                     <div className="flex items-center m-3">
                       <img src="/img/xp.png" className="h-[25px]"/>
-                      <SemiHighlightedText text={`${xp}`} color={'#FF7700'} customHeight={"7px"}/>
+                      <SemiHighlightedText text={`${xp}`} color={xpColor} customHeight={"7px"}/>
                     </div>
 
                     <div className="flex items-center m-3">
-                      <SemiHighlightedText text={`${tr}`} color={'#FF7700'} customHeight={"7px"}/>
+                      <SemiHighlightedText text={`${tr}`} color={trColor} customHeight={"7px"}/>
                       <img src="/img/tr.png" className="h-[25px]"/>
                     </div>
                     
                     <div className="flex items-center m-3">
-                      <SemiHighlightedText text={atk > 1 ? `${atk}⚔ attaques` : `${atk}⚔ attaque`} color={'#FF7700'} customHeight={"7px"}/>
+                      <SemiHighlightedText text={atk > 1 ? `${atk}⚔ attaques` : `${atk}⚔ attaque`} color={atkRateColor} customHeight={"7px"}/>
                     </div>
                     
                     <div className="flex items-center m-3">
-                      <SemiHighlightedText text={`${atkRate} attaques/jours`} color={'#FF7700'} customHeight={"7px"}/>
+                      <SemiHighlightedText text={`${atkRate} attaques/jours`} color={atkRateColor} customHeight={"7px"}/>
                     </div>
 
                     <div className="flex items-center m-3">
-                      <SemiHighlightedText text={`${warStars} étoiles gagnées en gdc`} color={'#FF7700'} customHeight={"7px"}/>
+                      <SemiHighlightedText text={`${warStars} étoiles gagnées en gdc`} color={warStarsColor} customHeight={"7px"}/>
                     </div>
                     
                   </div>
                   <p className="ml-auto text-right text-xl font-bold">détecté sans clan depuis : {noClanDuration}</p>
                 </div>
               
-              <div className="flex justify-between m-10">
-                <button className=" dark:text-white text-black bg-red-500 hover:bg-red-600 font-semibold py-2 px-4 rounded" onClick={onButtonForBlackListPlayerClick}>pas de ca dans mon clan</button>
-                <a className="dark:bg-gray-700 dark:hover:bg-gray-600 dark:text-white text-black bg-slate-200 hover:bg-slate-300 font-bold py-2 px-4 rounded" href={`https://link.clashofclans.com/?action=OpenPlayerProfile&tag=%23${id.slice(1)}`} >voir sur le jeu</a>
-                <button className=" dark:text-white text-black bg-green-500 hover:bg-green-600 font-semibold py-2 px-4 rounded" onClick={onButtonForMarkPlayerInvitedClick}>c'est invité, au suivant !</button>
+              <div className="flex justify-between mt-10 mb-2 ml-5 mr-5">
+                <button className="font-semibold flex items-center p-2" onClick={onButtonForBlackListPlayerClick}>
+                  <img src="/img/x.png" className="h-[37px] mr-2" loading="lazy"/>
+                  <SemiHighlightedText text={"pas de ça dans mon clan"} customHeight={"5px"} color={"#E60000"}/>
+                </button>
+                { !profileChecked &&
+                  <a className= "dark:text-white text-black font-bold flex items-center p-2" href={`https://link.clashofclans.com/?action=OpenPlayerProfile&tag=%23${id.slice(1)}`} onClick={checkProfile} >
+                    
+                    <SemiHighlightedText text={"voir sur le jeu"} color={"#e2e8f0"} customHeight={"5px"}/>
+                    <img src="/img/info.png" className="h-[37px] ml-2" loading="lazy"/>
+                    </a>
+                }
+                {profileChecked && 
+                  <button className="dark:text-white text-black font-semibold flex items-center p-2 " onClick={onButtonForMarkPlayerInvitedClick}>
+                    <SemiHighlightedText text={"c'est invité, au suivant !"} color={"#00C400"} customHeight={"5px"}/>
+                    <img src="/img/checkMark.png" classname="h-[37px] ml-2" loading="lazy"/>
+                  </button>
+                }
               </div>
             </div>
           </div>
