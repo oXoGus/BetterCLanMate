@@ -1,6 +1,6 @@
 import React from 'react';
 
-const UnderlineText = ({ text, color, customHeight }) => {
+const UnderlineText = ({ text, color, customHeight, customBottom }) => {
   return (
     // les position absolue sur relative a la div elle même
     <div className="relative inline-block">

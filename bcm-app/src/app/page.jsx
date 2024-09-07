@@ -185,9 +185,13 @@ export default function Home() {
       // et quand c'est entre les deux on fait un dégradé entre le rouge et le vert qui dépend du rate 
       
       if (playerData[0].expLevel > xpBornMax[playerData[0].townHallLevel - 1]){
+        var rXp = 0;
+        var gXp = green;
         setXpColor(rgbToHex(0, green, 0)) // max green 
       }
       else if (playerData[0].expLevel < xpBornMin[playerData[0].townHallLevel - 1]){
+        var rXp = red;
+        var gXp = 0;
         setXpColor(rgbToHex(red, 0, 0)) // max red
       }
       else {
@@ -204,6 +208,8 @@ export default function Home() {
       
       //pour la couleur des tr c'est comme pour l'xp
       if (playerData[0].trophies >= 5000){
+        var rTr = 0;
+        var gTr = green;
         setTrColor(rgbToHex(0, green, 0));
       }
       else {
@@ -230,6 +236,8 @@ export default function Home() {
 
       // pour l'atkRateColor
       if (_atkRate >= 1 ) {
+        var rAtkRate = 0;
+        var gAtkRate = green;
         setAtkRateColor(rgbToHex(0, green, 0));
       }
       else {
@@ -396,12 +404,10 @@ export default function Home() {
     <div className={darkMode ? "dark" : ""}>
       <div className="absolute  lg:h-full md:h-auto w-full bg-[#FFF1E2] text-black dark:text-white dark:bg-gray-800">
         <div className="dark:text-gray-100 text-gray-900 sm:text-5xl md:text-4xl p-3 flex justify-between">
-            <div>
-              <a className="font-semibold" href="/"><UnderlineText text={"BetterClanMate"} color={'#FF7700'} customHeight={"7px"}/></a>
-            </div>
-            <button className="bg-neutral-900 dark:bg-white rounded text-white text-xl dark:text-black font-semibold p-1" onClick={changeDarkMode}>
-            {darkMode ? "mode clair" : "mode sombre"}
-          </button>
+          
+          <a className="font-semibold" href="/"><UnderlineText text={"BetterClanMate"} color={'#FF7700'} customHeight={"7px"}/></a>
+          
+          <a href="/profile" className="text-2xl font-semibold" ><UnderlineText text={"se connecter"} color={"#FF7700"} customHeight={"7px"}/></a>
         </div>
         {/*  partie dynamique  */}
         {/*  tant qu'on a pas reçus les données du joueur  */}
@@ -413,30 +419,31 @@ export default function Home() {
             <div className="bg-white m-5 rounded-2xl p-3">
                 <div className="flex justify-between">
                   <div className="relative w-[167px] h-[183px]">
-                    <img src={townHallWeaponLevel ? `/img/hdv${hdv}-${townHallWeaponLevel}.png` : `/img/hdv${hdv}.png` } className="z-0 h-full w-full" loading="lazy"/>
+                    <img src={townHallWeaponLevel ? `/img/hdv${hdv}-${townHallWeaponLevel}.png` : `/img/hdv${hdv}.png` } className="z-0 w-full" loading="lazy"/>
                     <p className=" absolute inset-0 text-2xl mb-4"><HighlightedText text={userName} color={'#FF7700'} customHeight={"35px"}/></p>
                   </div>
                   <div className="flex flex-wrap justify-between mt-10">
-                    <div className="flex items-center m-3">
+
+                    <div className="flex items-center font-bold m-3">
                       <img src="/img/xp.png" className="h-[25px]"/>
-                      <SemiHighlightedText text={`${xp}`} color={xpColor} customHeight={"7px"}/>
+                      <SemiHighlightedText text={`${xp}`} color={xpColor} customHeight={"5px"}/>
                     </div>
 
-                    <div className="flex items-center m-3">
-                      <SemiHighlightedText text={`${tr}`} color={trColor} customHeight={"7px"}/>
+                    <div className="flex items-center font-bold m-3">
+                      <SemiHighlightedText text={`${tr}`} color={trColor} customHeight={"5px"}/>
                       <img src="/img/tr.png" className="h-[25px]"/>
                     </div>
                     
-                    <div className="flex items-center m-3">
-                      <SemiHighlightedText text={atk > 1 ? `${atk}⚔ attaques` : `${atk}⚔ attaque`} color={atkRateColor} customHeight={"7px"}/>
+                    <div className="flex items-center font-bold m-3">
+                      <SemiHighlightedText text={atk > 1 ? `${atk}⚔ attaques` : `${atk}⚔ attaque`} color={atkRateColor} customHeight={"5px"}/>
                     </div>
                     
-                    <div className="flex items-center m-3">
-                      <SemiHighlightedText text={`${atkRate} attaques/jours`} color={atkRateColor} customHeight={"7px"}/>
+                    <div className="flex items-center font-bold m-3">
+                      <SemiHighlightedText text={`${atkRate} attaques/jours`} color={atkRateColor} customHeight={"5px"}/>
                     </div>
 
-                    <div className="flex items-center m-3">
-                      <SemiHighlightedText text={`${warStars} étoiles gagnées en gdc`} color={warStarsColor} customHeight={"7px"}/>
+                    <div className="flex items-center font-bold m-3">
+                      <SemiHighlightedText text={`${warStars} étoiles gagnées en gdc`} color={warStarsColor} customHeight={"5px"}/>
                     </div>
                     
                   </div>
@@ -444,21 +451,22 @@ export default function Home() {
                 </div>
               
               <div className="flex justify-between mt-10 mb-2 ml-5 mr-5">
-                <button className="font-semibold flex items-center p-2" onClick={onButtonForBlackListPlayerClick}>
+                <button className="font-bold flex items-center p-2" onClick={onButtonForBlackListPlayerClick}>
                   <img src="/img/x.png" className="h-[37px] mr-2" loading="lazy"/>
-                  <SemiHighlightedText text={"pas de ça dans mon clan"} customHeight={"5px"} color={"#E60000"}/>
+                  <SemiHighlightedText text={"pas de ça dans mon clan"} customHeight={"4px"} color={"#E60000"}/>
                 </button>
                 { !profileChecked &&
                   <a className= "dark:text-white text-black font-bold flex items-center p-2" href={`https://link.clashofclans.com/?action=OpenPlayerProfile&tag=%23${id.slice(1)}`} onClick={checkProfile} >
                     
-                    <SemiHighlightedText text={"voir sur le jeu"} color={"#e2e8f0"} customHeight={"5px"}/>
+                    <SemiHighlightedText text={"voir sur le jeu"} color={profileColor} customHeight={"4px"}/>
                     <img src="/img/info.png" className="h-[37px] ml-2" loading="lazy"/>
-                    </a>
+                  </a>
                 }
                 {profileChecked && 
-                  <button className="dark:text-white text-black font-semibold flex items-center p-2 " onClick={onButtonForMarkPlayerInvitedClick}>
-                    <SemiHighlightedText text={"c'est invité, au suivant !"} color={"#00C400"} customHeight={"5px"}/>
-                    <img src="/img/checkMark.png" classname="h-[37px] ml-2" loading="lazy"/>
+                  <button className="text-black font-bold flex items-center p-2 " onClick={onButtonForMarkPlayerInvitedClick}>
+
+                    <SemiHighlightedText text={"c'est invité, au suivant !"} color={"#00C400"} customHeight={"4px"}/>
+                    <img src="/img/checkMark.png" className="h-[37px] ml-2" loading="lazy"/>
                   </button>
                 }
               </div>
