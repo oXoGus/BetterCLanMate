@@ -119,6 +119,7 @@ export default function Home() {
               />
             </div>
           </div>
+          <button className=" text-black bg-[#FF7700] mt-3 hover:bg-[#FFF1E2] font-semibold " >{"coming soon"}</button>
         </div>
       </div>  
     </div> 

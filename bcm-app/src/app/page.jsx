@@ -36,7 +36,9 @@ export default function Home() {
   const [darkMode, setDarkMode] = useState(false)
   const [byPass, setByPass] = useState(false)
   const [windowHeight, setWindowHeight] =useState(null);
-  const [profileChecked, setProfileChecked] = useState(false)
+  const [profileChecked, setProfileChecked] = useState(false);
+  const [blackListPlayerLoading, setBlackListPlayerLoading] = useState(false);
+  const [markPlayerInvitedLoading, setMarkPlayerInvitedLoading] = useState(false);
 
   // les useState pour les stats du joueurs
   const [id, setId] = useState(null);
@@ -59,8 +61,8 @@ export default function Home() {
   // les couleur 
   const red = 230;
   const green = 196; 
-  const xpBornMin = [0, 5, 10, 10, 15, 20, 30, 50, 65, 75, 100, 140, 160, 180, 200, 220]
-  const xpBornMax = [10, 20, 25, 25, 35, 45, 55, 70, 90, 110, 140, 160, 180, 200, 220, 240]
+  const xpBornMin = [0, 5, 10, 10, 15, 20, 30, 50, 65, 75, 100, 140, 160, 175, 200, 220]
+  const xpBornMax = [10, 20, 25, 25, 35, 45, 55, 70, 90, 110, 140, 160, 175, 200, 220, 240]
   const [xpColor, setXpColor] = useState(null);
   const [trColor, setTrColor] = useState(null);
   const [atkRateColor, setAtkRateColor] = useState(null);
@@ -312,6 +314,11 @@ export default function Home() {
       // TODO : faire le labo + labels + heros
 
 
+      // on retire tout les chargement
+      setLoading(false)
+      setMarkPlayerInvitedLoading(false)
+      setProfileChecked(false)
+      setBlackListPlayerLoading(false)
       setPlayerDataReceive(true)
     }
   }, [playerData]);
@@ -330,6 +337,8 @@ export default function Home() {
   /*********  black list player *********/ 
 
   const onButtonForBlackListPlayerClick = () => {
+    setBlackListPlayerLoading(true)
+
     // on change l'état pour trigger le useEffect
     
     setBlackListPlayer(!blackListPlayer)
@@ -370,7 +379,7 @@ export default function Home() {
 
   const onButtonForMarkPlayerInvitedClick = () => {
     // on change l'état pour trigger le useEffect
-    setProfileChecked(false)
+    setMarkPlayerInvitedLoading(true);
     setMarkPlayerInvited(!markPlayerInvited)
     console.log(markPlayerInvited)
     if (!playerInvitedByPass){
@@ -418,42 +427,96 @@ export default function Home() {
           <div className="">
             <div className="bg-white m-5 rounded-2xl p-3">
                 <div className="flex justify-between">
-                  <div className="relative w-[167px] h-[183px]">
-                    <img src={townHallWeaponLevel ? `/img/hdv${hdv}-${townHallWeaponLevel}.png` : `/img/hdv${hdv}.png` } className="z-0 w-full" loading="lazy"/>
-                    <p className=" absolute inset-0 text-2xl mb-4"><HighlightedText text={userName} color={'#FF7700'} customHeight={"35px"}/></p>
+                  <div className="relative w-auto h-[183px]">
+                    {
+                      loading ? 
+                      <div>
+                        <img src={"/img/hdv1.png" } className="z-0 w-full" loading="lazy"/>
+                        <p className=" absolute inset-0 text-2xl mb-4"><HighlightedText text={'...'} color={'#FF7700'} customHeight={"35px"}/></p>
+                      </div>
+                      :
+                      <div>
+                        <img src={townHallWeaponLevel ? `/img/hdv${hdv}-${townHallWeaponLevel}.png` : `/img/hdv${hdv}.png` } className="z-0 w-full" loading="lazy"/>
+                        <p className=" absolute inset-0 font-semibold text-2xl w-[200px] mb-4"><HighlightedText text={userName} color={'#FF7700'} customHeight={"35px"}/></p>
+                      </div>
+                    }
+                    
                   </div>
                   <div className="flex flex-wrap justify-between mt-10">
-
-                    <div className="flex items-center font-bold m-3">
-                      <img src="/img/xp.png" className="h-[25px]"/>
-                      <SemiHighlightedText text={`${xp}`} color={xpColor} customHeight={"5px"}/>
-                    </div>
-
-                    <div className="flex items-center font-bold m-3">
-                      <SemiHighlightedText text={`${tr}`} color={trColor} customHeight={"5px"}/>
-                      <img src="/img/tr.png" className="h-[25px]"/>
-                    </div>
+                    {
+                      loading ?
+                      <div className="flex items-center font-bold m-3">
+                        <img src="/img/xp.png" className="h-[25px]"/>
+                        <SemiHighlightedText text={`...`} color={xpColor} customHeight={"5px"}/>
+                      </div>
+                    :
+                      <div className="flex items-center font-bold m-3">
+                        <img src="/img/xp.png" className="h-[25px]"/>
+                        <SemiHighlightedText text={`${xp}`} color={xpColor} customHeight={"5px"}/>
+                      </div>
+                    }
                     
-                    <div className="flex items-center font-bold m-3">
-                      <SemiHighlightedText text={atk > 1 ? `${atk}⚔ attaques` : `${atk}⚔ attaque`} color={atkRateColor} customHeight={"5px"}/>
-                    </div>
+                    {
+                      loading ?
+                      <div className="flex items-center font-bold m-3">
+                        <SemiHighlightedText text={`...`} color={trColor} customHeight={"5px"}/>
+                        <img src="/img/tr.png" className="h-[25px]"/>
+                      </div>
+                    :
+                      <div className="flex items-center font-bold m-3">
+                        <SemiHighlightedText text={`${tr}`} color={trColor} customHeight={"5px"}/>
+                        <img src="/img/tr.png" className="h-[25px]"/>
+                      </div>
+                    }
                     
-                    <div className="flex items-center font-bold m-3">
-                      <SemiHighlightedText text={`${atkRate} attaques/jours`} color={atkRateColor} customHeight={"5px"}/>
-                    </div>
-
-                    <div className="flex items-center font-bold m-3">
-                      <SemiHighlightedText text={`${warStars} étoiles gagnées en gdc`} color={warStarsColor} customHeight={"5px"}/>
-                    </div>
+                    { 
+                      loading ?
+                      <div className="flex items-center font-bold m-3">
+                        <SemiHighlightedText text={'...'} color={atkRateColor} customHeight={"5px"}/>
+                      </div>
+                      :
+                      <div className="flex items-center font-bold m-3">
+                        <SemiHighlightedText text={atk > 1 ? `${atk}⚔ attaques` : `${atk}⚔ attaque`} color={atkRateColor} customHeight={"5px"}/>
+                      </div>
+                    }
+                    
+                    {
+                      loading ?
+                      <div className="flex items-center font-bold m-3">
+                        <SemiHighlightedText text={`...`} color={atkRateColor} customHeight={"5px"}/>
+                      </div>
+                      :
+                      <div className="flex items-center font-bold m-3">
+                        <SemiHighlightedText text={`${atkRate} attaques/jours`} color={atkRateColor} customHeight={"5px"}/>
+                      </div>
+                    }
+                    
+                    {
+                      loading ?
+                      <div className="flex items-center font-bold m-3">
+                        <SemiHighlightedText text={`...`} color={warStarsColor} customHeight={"5px"}/>
+                      </div>
+                      :
+                      <div className="flex items-center font-bold m-3">
+                        <SemiHighlightedText text={`${warStars} étoiles gagnées en gdc`} color={warStarsColor} customHeight={"5px"}/>
+                      </div>
+                    }
+                    
                     
                   </div>
-                  <p className="ml-auto text-right text-xl font-bold">détecté sans clan depuis : {noClanDuration}</p>
+                  { 
+                    loading ?
+                      <p className="ml-auto text-right text-xl font-bold">détecté sans clan depuis : ...</p>
+                    :
+                      <p className="ml-auto text-right text-xl font-bold">détecté sans clan depuis : {noClanDuration}</p>
+                  }
+                  
                 </div>
               
               <div className="flex justify-between mt-10 mb-2 ml-5 mr-5">
                 <button className="font-bold flex items-center p-2" onClick={onButtonForBlackListPlayerClick}>
                   <img src="/img/x.png" className="h-[37px] mr-2" loading="lazy"/>
-                  <SemiHighlightedText text={"pas de ça dans mon clan"} customHeight={"4px"} color={"#E60000"}/>
+                  <SemiHighlightedText text={blackListPlayerLoading ? "..." : "pas de ça dans mon clan"} customHeight={"4px"} color={"#E60000"}/>
                 </button>
                 { !profileChecked &&
                   <a className= "dark:text-white text-black font-bold flex items-center p-2" href={`https://link.clashofclans.com/?action=OpenPlayerProfile&tag=%23${id.slice(1)}`} onClick={checkProfile} >
@@ -465,7 +528,7 @@ export default function Home() {
                 {profileChecked && 
                   <button className="text-black font-bold flex items-center p-2 " onClick={onButtonForMarkPlayerInvitedClick}>
 
-                    <SemiHighlightedText text={"c'est invité, au suivant !"} color={"#00C400"} customHeight={"4px"}/>
+                    <SemiHighlightedText text={markPlayerInvitedLoading ? "..." : "c'est invité, au suivant !"} color={"#00C400"} customHeight={"4px"}/>
                     <img src="/img/checkMark.png" className="h-[37px] ml-2" loading="lazy"/>
                   </button>
                 }
