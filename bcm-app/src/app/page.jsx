@@ -1,9 +1,6 @@
 "use client";
-
-
 import axios from "axios";
 import { useEffect, useRef, useState } from "react";
-import Navbar from "../components/Navbar";
 import HighlightedText from "../components/HighlightedText";
 import Image from "next/image"
 import './animation.css';
@@ -16,7 +13,6 @@ export default function Home() {
   
   const spanRef = useRef(null);
   const underlineRef = useRef(null);
-
 
   const [playerInvitedByPass, setPlayerInvitedByPass] =useState(false)
   const [markPlayerInvited, setMarkPlayerInvited] = useState(false)
@@ -35,7 +31,6 @@ export default function Home() {
   const [errorBadClanTag, setErrorBadClanTag] = useState(false)
   const [darkMode, setDarkMode] = useState(false)
   const [byPass, setByPass] = useState(false)
-  const [windowHeight, setWindowHeight] =useState(null);
   const [profileChecked, setProfileChecked] = useState(false);
   const [blackListPlayerLoading, setBlackListPlayerLoading] = useState(false);
   const [markPlayerInvitedLoading, setMarkPlayerInvitedLoading] = useState(false);
@@ -60,6 +55,7 @@ export default function Home() {
 
   // les couleur 
   const red = 230;
+  const grayLoading = "#DEDEDE"
   const green = 196; 
   const xpBornMin = [0, 5, 10, 10, 15, 20, 30, 50, 65, 75, 100, 140, 160, 175, 200, 220]
   const xpBornMax = [10, 20, 25, 25, 35, 45, 55, 70, 90, 110, 140, 160, 175, 200, 220, 240]
@@ -77,13 +73,6 @@ export default function Home() {
     setClanTag(event.target.value);
   }
 
-  const changeDarkMode = () => {
-
-    // on inverse la valeur du dark mode
-    setDarkMode(!darkMode)
-  }
-
-
   /* on met la largeur du soulignement a la largeur du spam (du text) dès que le text change  */
   useEffect(() => {
     if (spanRef.current && underlineRef.current && spanRef.current.offsetWidth < 210) {
@@ -91,9 +80,6 @@ export default function Home() {
     }
   }, [clanTag]);
 
-  useEffect(() => {
-    setWindowHeight(window.innerHeight)
-  }, [window.innerHeight])
 
   /*********  searchPlayer without clan data fetching *********/ 
 
@@ -103,21 +89,23 @@ export default function Home() {
     setApiError(false)
     setErrorBadClanTag(false)
     setNoPlayerMatch(false)
+    console.log("début de la requette à l'api")
     // on demande a l'api de chercher les joueurs sans clan qui correspondent au prérequis du clanTag
-    axios.get(`${window.location.origin}/api/get/searchPlayerWithNoClan/${clanTag.slice(1)}`, { timeout: 10000 })
+    axios.get(`${window.location.origin}/api/get/searchPlayerWithNoClan/${clanTag.slice(1)}`)
       .then((response) => {
         // on reset les err
+        //console.log("réponse de l'api")
         setApiError(false)
         setErrorBadClanTag(false)
         setNoPlayerMatch(false)
 
-        console.log(response.data[0]);
+        console.log(response.data);
         setPlayerData(response.data);
 
       })
       .catch((error) => {
         setLoading(false)
-        //console.log(error);
+        console.log(error);
 
         if (error.response) {
           // si le tag n'est pas bon
@@ -160,6 +148,7 @@ export default function Home() {
 
   useEffect(() => {
     if (byPass){
+      //console.log("1er useEffect trigger")
       searchPlayer()
     }
   }, [searchNewPlayer])
@@ -170,13 +159,13 @@ export default function Home() {
     // si playerData a ete mis a jours a cause de l'async de la requette a l'api qui faisait tout buggé
     if (playerData) {
       const now = new Date();
+      
 
-
-      setId(playerData[0].tag);
+      setId(playerData[0].id);
       setUserName(playerData[0].name)
-      setHdv(playerData[0].townHallLevel);
-      setTr(playerData[0].trophies);
-      setXp(playerData[0].expLevel);
+      setHdv(playerData[0].hdv);
+      setTr(playerData[0].tr);
+      setXp(playerData[0].xp);
 
 
 
@@ -186,12 +175,12 @@ export default function Home() {
       // pareil avec la couleur verte avec la liste xpBorneMax 
       // et quand c'est entre les deux on fait un dégradé entre le rouge et le vert qui dépend du rate 
       
-      if (playerData[0].expLevel > xpBornMax[playerData[0].townHallLevel - 1]){
+      if (playerData[0].xp > xpBornMax[playerData[0].hdv - 1]){
         var rXp = 0;
         var gXp = green;
         setXpColor(rgbToHex(0, green, 0)) // max green 
       }
-      else if (playerData[0].expLevel < xpBornMin[playerData[0].townHallLevel - 1]){
+      else if (playerData[0].xp < xpBornMin[playerData[0].hdv - 1]){
         var rXp = red;
         var gXp = 0;
         setXpColor(rgbToHex(red, 0, 0)) // max red
@@ -199,7 +188,7 @@ export default function Home() {
       else {
 
         // le rate est le raport entre le nombre de niveau que le joueur doit gagner pour avoir la couleur verte max (la borne max) sur le nombre de niveau entre la couleur rouge et le vert max 
-        let rate = (1 / (xpBornMax[playerData[0].townHallLevel - 1] - xpBornMin[playerData[0].townHallLevel - 1]) * (playerData[0].expLevel - xpBornMin[playerData[0].townHallLevel - 1]));
+        let rate = (1 / (xpBornMax[playerData[0].hdv - 1] - xpBornMin[playerData[0].hdv - 1]) * (playerData[0].xp - xpBornMin[playerData[0].hdv - 1]));
         
         // équation de droite pour avoir la coposante rouge et verte du dégradé selon le rate qui est entre 0 et 1 
         var rXp = parseInt(red - red * rate);
@@ -209,13 +198,13 @@ export default function Home() {
       }
       
       //pour la couleur des tr c'est comme pour l'xp
-      if (playerData[0].trophies >= 5000){
+      if (playerData[0].tr >= 5000){
         var rTr = 0;
         var gTr = green;
         setTrColor(rgbToHex(0, green, 0));
       }
       else {
-        let rate = (1 / (5000 - playerData[2].requiredTrophies) * (playerData[0].trophies - playerData[2].requiredTrophies))
+        let rate = (1 / (5000 - playerData[1].requiredTrophies) * (playerData[0].tr - playerData[1].requiredTrophies))
 
         var rTr = parseInt(red - red * rate);
         var gTr = parseInt(green * rate);
@@ -250,7 +239,7 @@ export default function Home() {
       }
 
 
-      setJdc(playerData[0].achievements[31].value)
+      //setJdc(playerData[0].achievements[31].value)
       setWarStars(playerData[0].warStars)
 
       // pour les etoiles de gdc  
@@ -276,7 +265,7 @@ export default function Home() {
       setProfileColor(rgbToHex(rMoy, gMoy, 0));
 
       // si le joueur a un townHallWeaponLevel alors on le save
-      if (playerData[0].townHallLevel >= 12) {
+      if (playerData[0].hdv >= 12) {
         setTownHallWeaponLevel(playerData[0].townHallWeaponLevel);
       }
 
@@ -287,7 +276,7 @@ export default function Home() {
       // on convertie le timestamp en forma lisible 
 
       // on convertie en date
-      const date = new Date(playerData[1].noClanDuration);
+      const date = new Date(playerData[0].noClanDuration);
       
       const diffMs = now - date; // Différence en millisecondes
 
@@ -432,12 +421,16 @@ export default function Home() {
                       loading ? 
                       <div>
                         <img src={"/img/hdv1.png" } className="z-0 w-full" loading="lazy"/>
-                        <p className=" absolute inset-0 text-2xl mb-4"><HighlightedText text={'...'} color={'#FF7700'} customHeight={"35px"}/></p>
+                        <div className=" absolute inset-0 font-semibold text-2xl w-[200px] mb-4">
+                          <HighlightedText text={'...'} color={grayLoading} customHeight={"35px"}/>
+                        </div>
                       </div>
                       :
                       <div>
                         <img src={townHallWeaponLevel ? `/img/hdv${hdv}-${townHallWeaponLevel}.png` : `/img/hdv${hdv}.png` } className="z-0 w-full" loading="lazy"/>
-                        <p className=" absolute inset-0 font-semibold text-2xl w-[200px] mb-4"><HighlightedText text={userName} color={'#FF7700'} customHeight={"35px"}/></p>
+                        <div className=" absolute inset-0 font-semibold text-2xl w-[200px] mb-4">
+                          <HighlightedText text={userName} color={'#FF7700'} customHeight={"35px"}/>
+                        </div>
                       </div>
                     }
                     
@@ -447,7 +440,7 @@ export default function Home() {
                       loading ?
                       <div className="flex items-center font-bold m-3">
                         <img src="/img/xp.png" className="h-[25px]"/>
-                        <SemiHighlightedText text={`...`} color={xpColor} customHeight={"5px"}/>
+                        <SemiHighlightedText text={`...`} color={grayLoading} customHeight={"5px"}/>
                       </div>
                     :
                       <div className="flex items-center font-bold m-3">
@@ -459,7 +452,7 @@ export default function Home() {
                     {
                       loading ?
                       <div className="flex items-center font-bold m-3">
-                        <SemiHighlightedText text={`...`} color={trColor} customHeight={"5px"}/>
+                        <SemiHighlightedText text={`...`} color={grayLoading} customHeight={"5px"}/>
                         <img src="/img/tr.png" className="h-[25px]"/>
                       </div>
                     :
@@ -472,7 +465,7 @@ export default function Home() {
                     { 
                       loading ?
                       <div className="flex items-center font-bold m-3">
-                        <SemiHighlightedText text={'...'} color={atkRateColor} customHeight={"5px"}/>
+                        <SemiHighlightedText text={'...'} color={grayLoading} customHeight={"5px"}/>
                       </div>
                       :
                       <div className="flex items-center font-bold m-3">
@@ -483,7 +476,7 @@ export default function Home() {
                     {
                       loading ?
                       <div className="flex items-center font-bold m-3">
-                        <SemiHighlightedText text={`...`} color={atkRateColor} customHeight={"5px"}/>
+                        <SemiHighlightedText text={`...`} color={grayLoading} customHeight={"5px"}/>
                       </div>
                       :
                       <div className="flex items-center font-bold m-3">
@@ -494,7 +487,7 @@ export default function Home() {
                     {
                       loading ?
                       <div className="flex items-center font-bold m-3">
-                        <SemiHighlightedText text={`...`} color={warStarsColor} customHeight={"5px"}/>
+                        <SemiHighlightedText text={`...`} color={grayLoading} customHeight={"5px"}/>
                       </div>
                       :
                       <div className="flex items-center font-bold m-3">

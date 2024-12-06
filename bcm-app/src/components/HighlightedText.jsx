@@ -6,7 +6,7 @@ const HighlightedText = ({ text, color, customHeight }) => {
     <div className="relative inline-block">
       {/* on creer le svg avec sa position  */}
       <svg
-        className="absolute left-0 top-1/2 transform -translate-y-1/2"
+        className="absolute left-0 top-1/2 transform -translate-y-1/2 "
         width="100%"
         height={customHeight}
       >
@@ -19,7 +19,7 @@ const HighlightedText = ({ text, color, customHeight }) => {
         />
       </svg>
       <span className="relative">{text}</span>
-    </div>
+    </div> 
   );
 };
 
